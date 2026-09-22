@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #fef9ef;
+  color: #1a1a1a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-display {
+  font-family: 'Archivo Black', 'Inter', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #f5eddd;
+}
+::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 0;
+  border: 2px solid #f5eddd;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff4f3a;
+}
+
+/* Utility classes */
+.panel {
+  border: 3px solid #1a1a1a;
+  box-shadow: 6px 6px 0 0 rgba(26,26,26,1);
+}
+
+.panel-sm {
+  border: 2px solid #1a1a1a;
+  box-shadow: 3px 3px 0 0 rgba(26,26,26,1);
+}
+
+.panel-lg {
+  border: 3px solid #1a1a1a;
+  box-shadow: 10px 10px 0 0 rgba(26,26,26,1);
+}
+
+.skew-tag {
+  transform: skewX(-8deg);
+}
+
+.btn-press {
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-press:active {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 0 rgba(26,26,26,1) !important;
+}
+
+/* Confetti dot */
+.confetti-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  animation: confettiBurst 0.8s ease-out forwards;
+}
+
+/* Date input styling */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.2);
+}
+
+/* Checkbox animation */
+@keyframes strikethrough {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.strike-line {
+  position: relative;
+}
+.strike-line::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 3px;
+  background: #1a1a1a;
+  animation: strikethrough 0.3s ease-out forwards;
+}
+
+/* Hide scrollbar for horizontal nav */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Paper texture for Thoughts diary */
+.paper-bg {
+  background-color: #fef9ef;
+  background-image:
+    linear-gradient(to right, rgba(26,26,26,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(26,26,26,0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.paper-lined {
+  background-color: #fef9ef;
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 27px,
+      rgba(62,193,237,0.18) 27px,
+      rgba(62,193,237,0.18) 28px
+    );
+}
+
+/* Card hover lift */
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-lift:hover {
+  transform: translateY(-3px);
+}
