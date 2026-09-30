@@ -28,7 +28,7 @@ export function Onboarding() {
             <div className="bg-coral border-3 border-cream w-14 h-14 flex items-center justify-center skew-tag shadow-glow">
               <span className="font-display text-3xl text-white" style={{ transform: 'skewX(8deg)' }}>D</span>
             </div>
-            <h1 className="font-display text-4xl text-cream tracking-tight">DAYFRAME</h1>
+            <h1 className="font-display text-4xl text-cream tracking-tight">DAYSONA</h1>
           </div>
           <p className="text-mist font-mono text-xs uppercase tracking-[0.3em]">Every day is a new round</p>
         </div>

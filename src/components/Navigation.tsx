@@ -34,7 +34,7 @@ export function TopNavigation({ current, onNavigate, streakCount }: TopNavigatio
             <span className="skew-x-6 font-display text-xl text-white">D</span>
           </div>
           <div className="hidden lg:block">
-            <h1 className="font-display text-lg leading-none">DAYFRAME</h1>
+            <h1 className="font-display text-lg leading-none">DAYSONA</h1>
             <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-ink/50">New round / new day</p>
           </div>
         </div>
