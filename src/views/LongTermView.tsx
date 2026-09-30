@@ -58,10 +58,13 @@ export function LongTermView() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="mb-5 flex items-end justify-between">
-        <div>
-          <h1 className="font-display text-3xl uppercase leading-none text-leafDark">Long Term</h1>
-          <p className="mt-1 font-mono text-xs text-ink/50">{data.longTerm.length} goals — the big picture</p>
+      <div className="page-hero manga-panel manga-enter mb-6 flex items-center justify-between gap-3 border-3 border-ink bg-white p-4 shadow-panel">
+        <div className="flex items-center gap-3">
+          <div className="page-hero-icon"><Target size={22} strokeWidth={2.7} /></div>
+          <div>
+            <h1 className="font-display text-3xl uppercase leading-none text-ink">Long Term</h1>
+            <p className="mt-1 font-mono text-xs text-ink/60">{data.longTerm.length} goals · Plan and track what you want to achieve</p>
+          </div>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}

@@ -14,7 +14,7 @@ export function Panel({ children, className = '', bg = 'bg-cream', size = 'md', 
   return (
     <div
       onClick={onClick}
-      className={`${bg} ${border} border-ink ${shadow} ${onClick ? 'cursor-pointer btn-press' : ''} ${className}`}
+      className={`manga-panel ${bg} ${border} border-ink ${shadow} ${onClick ? 'cursor-pointer btn-press' : ''} ${className}`}
     >
       {children}
     </div>

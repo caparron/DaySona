@@ -37,7 +37,7 @@ export function TodayView() {
   return (
     <div className="mx-auto max-w-3xl">
       {/* Hero header */}
-      <div className="mb-6">
+      <div className="manga-panel mission-checker-bg mb-6 border-2 border-ink p-4 shadow-panel">
         <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
           <div>
             <Tag color="bg-ink text-cream">DAY {now.getDate()}</Tag>
@@ -79,7 +79,7 @@ export function TodayView() {
       </div>
 
       {/* Today's Missions */}
-      <div className="border-2 border-ink bg-cream p-5 shadow-panel">
+      <div className="manga-panel mission-checker-bg border-2 border-ink p-5 shadow-panel">
         <div className="mb-4 flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center border-2 border-ink bg-coral">
             <span className="font-display text-xs text-white">M</span>

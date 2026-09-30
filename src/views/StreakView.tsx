@@ -36,13 +36,11 @@ export function StreakView() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="mb-5 flex items-end justify-between">
+      <div className="page-hero manga-panel manga-enter mb-6 flex items-center gap-3 border-3 border-ink bg-white p-4 shadow-panel">
+        <div className="page-hero-icon"><Flame size={22} strokeWidth={2.7} /></div>
         <div>
-          <h1 className="font-display text-3xl uppercase leading-none text-ember">Streak</h1>
-          <p className="mt-1 font-mono text-xs text-ink/50">{totalCompleted} days completed total</p>
-        </div>
-        <div className="flex h-10 w-10 animate-floatY items-center justify-center border-2 border-ink bg-ember shadow-panelSm">
-          <Flame size={20} strokeWidth={2.5} className="text-white" />
+          <h1 className="font-display text-3xl uppercase leading-none text-ink">Streak</h1>
+          <p className="mt-1 font-mono text-xs text-ink/60">{totalCompleted} days completed · Keep your daily consistency going</p>
         </div>
       </div>
 

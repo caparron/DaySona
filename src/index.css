@@ -67,6 +67,61 @@ body {
   box-shadow: 10px 10px 0 0 rgba(26,26,26,1);
 }
 
+.mission-checker-bg {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.mission-checker-bg::before {
+  content: '';
+  position: absolute;
+  inset: -120px;
+  z-index: -1;
+  transform: rotate(-20deg);
+  background-image: conic-gradient(#edeef1 25%, #fff 0 50%, #f1f2f5 0 75%, #fff 0);
+  background-size: 20px 20px;
+}
+
+/* Manga-inspired hard shadows and quick panel motion */
+.manga-panel {
+  outline: 1px solid #1a1a1a;
+  outline-offset: 2px;
+  box-shadow: 7px 7px 0 #1a1a1a !important;
+  transform: rotate(-0.55deg);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.manga-panel:hover {
+  transform: rotate(0deg) translateY(-2px);
+  box-shadow: 9px 9px 0 #1a1a1a !important;
+}
+.page-hero {
+  position: relative;
+}
+.page-hero-icon {
+  display: flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #1a1a1a;
+  background: #facc15;
+  color: #1a1a1a;
+  box-shadow: 3px 3px 0 #1a1a1a;
+  transform: skewX(-7deg);
+}
+.manga-enter {
+  animation: mangaEnter 420ms cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes mangaEnter {
+  from { opacity: 0; translate: 0 12px; }
+  to { opacity: 1; translate: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .manga-enter { animation: none; }
+  .manga-panel { transition: none; }
+}
+
 .skew-tag {
   transform: skewX(-8deg);
 }

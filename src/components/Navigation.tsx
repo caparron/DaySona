@@ -27,11 +27,11 @@ interface TopNavigationProps {
 
 export function TopNavigation({ current, onNavigate, streakCount }: TopNavigationProps) {
   return (
-    <header className="sticky top-0 z-40 border-b-3 border-ink bg-cream/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b-3 border-ink bg-yellow-300/95 backdrop-blur-sm">
       <div className="mx-auto flex max-w-[1440px] items-center gap-4 px-4 py-3 md:px-7">
         <div className="hidden shrink-0 items-center gap-2 sm:flex">
-          <div className="flex h-10 w-10 -skew-x-6 items-center justify-center border-2 border-ink bg-coral shadow-panelSm">
-            <span className="skew-x-6 font-display text-xl text-white">D</span>
+          <div className="flex h-10 w-10 -skew-x-6 items-center justify-center border-2 border-ink bg-yellow-400 shadow-panelSm">
+            <span className="skew-x-6 font-display text-xl text-ink">D</span>
           </div>
           <div className="hidden lg:block">
             <h1 className="font-display text-lg leading-none">DAYSONA</h1>

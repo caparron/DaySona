@@ -49,14 +49,12 @@ export function CalendarView() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center border-2 border-ink bg-rose shadow-panelSm">
-            <CalendarDays size={18} strokeWidth={2.5} className="text-white" />
-          </div>
+      <div className="page-hero manga-panel manga-enter mb-6 flex items-center justify-between gap-3 border-3 border-ink bg-white p-4 shadow-panel">
+        <div className="flex items-center gap-3">
+          <div className="page-hero-icon"><CalendarDays size={22} strokeWidth={2.7} /></div>
           <div>
-            <h1 className="font-display text-2xl uppercase leading-none">Calendar</h1>
-            <p className="mt-0.5 font-mono text-xs text-ink/50">Browse any day</p>
+            <h1 className="font-display text-3xl uppercase leading-none text-ink">Calendar</h1>
+            <p className="mt-1 font-mono text-xs text-ink/60">Browse dates and review your daily activity</p>
           </div>
         </div>
         {selectedDate !== todayKey() && (
