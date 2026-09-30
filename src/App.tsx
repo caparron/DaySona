@@ -54,7 +54,7 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-yellow-300">
       <TopNavigation current={view} onNavigate={setView} streakCount={data.streak.current} />
 
       <main className="mx-auto max-w-5xl px-4 pb-24 pt-5 md:px-7 md:pb-10 md:pt-7">
