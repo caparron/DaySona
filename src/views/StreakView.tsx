@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Flame, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Tag } from '@/components/Panel';
-import { monthGrid, dateKey as toDateKey, monthLong, todayKey, parseKey, isToday } from '@/utils/date';
+import { monthGrid, dateKey as toDateKey, monthLong, parseKey, isToday } from '@/utils/date';
 
 export function StreakView() {
   const { data } = useApp();

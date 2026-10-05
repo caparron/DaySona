@@ -48,7 +48,7 @@ export function ThoughtsView() {
       </div>
 
       {/* New thought — paper sheet */}
-      <div className="paper-lined mb-6 border-2 border-ink shadow-panelSm">
+      <div className="paper-lined subtle-checker-bg mb-6 border-2 border-ink shadow-panelSm">
         <div className="flex items-center gap-2 border-b-2 border-sky/30 bg-sky/8 px-4 py-2">
           <div className="h-3 w-3 rounded-full border border-ink/30 bg-coral/40" />
           <div className="h-3 w-3 rounded-full border border-ink/30 bg-gold/50" />
@@ -93,7 +93,7 @@ export function ThoughtsView() {
           {sorted.map((t, i) => (
             <div
               key={t.id}
-              className="paper-bg card-lift group border-2 border-ink p-5 shadow-panelSm animate-slideUp"
+              className="paper-bg subtle-checker-bg card-lift group border-2 border-ink p-5 shadow-panelSm animate-slideUp"
               style={{ transform: `rotate(${(i % 3) - 1}deg)` }}
             >
               {editingId === t.id ? (

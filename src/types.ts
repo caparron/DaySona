@@ -5,6 +5,19 @@ export interface Mission {
   date: string; // YYYY-MM-DD
   createdAt: number;
   importance: number;
+  category?: string;
+}
+
+export interface Achievement {
+  id: string;
+  missionId: string;
+  title: string;
+  userName: string;
+  date: string;
+  createdAt: number;
+  photo?: string;
+  category?: string;
+  categoryColor?: string;
 }
 
 export interface Thought {
@@ -37,6 +50,7 @@ export interface LongTermGoal {
   targetDate?: string;
   milestones: Milestone[];
   createdAt: number;
+  category?: string;
 }
 
 export interface StreakData {
@@ -57,6 +71,9 @@ export interface AppData {
   thoughts: Thought[];
   questions: Question[];
   longTerm: LongTermGoal[];
+  achievements: Achievement[];
+  categories: string[];
+  categoryColors: Record<string, string>;
   streak: StreakData;
   successThreshold: number;
 }
@@ -74,6 +91,9 @@ export const emptyData: AppData = {
   thoughts: [],
   questions: [],
   longTerm: [],
+  achievements: [],
+  categories: [],
+  categoryColors: {},
   streak: emptyStreak,
   successThreshold: 70,
 };

@@ -1,6 +1,6 @@
-import { CalendarDays, Sun, Brain, HelpCircle, Target, Flame } from 'lucide-react';
+import { CalendarDays, Sun, Brain, HelpCircle, Target, Flame, LogOut, Trophy } from 'lucide-react';
 
-export type View = 'today' | 'thoughts' | 'questions' | 'longterm' | 'streak' | 'calendar';
+export type View = 'today' | 'thoughts' | 'questions' | 'longterm' | 'streak' | 'calendar' | 'achievements';
 
 interface NavItem {
   id: View;
@@ -17,22 +17,22 @@ export const NAV_ITEMS: NavItem[] = [
   { id: 'questions', label: 'QUESTIONS', icon: HelpCircle, color: 'bg-gold', active: 'bg-gold text-ink' },
   { id: 'longterm', label: 'LONG TERM', icon: Target, color: 'bg-leaf', active: 'bg-leaf text-white' },
   { id: 'streak', label: 'STREAK', icon: Flame, color: 'bg-ember', active: 'bg-ember text-white' },
+  { id: 'achievements', label: 'ACHIEVEMENTS', icon: Trophy, color: 'bg-leaf', active: 'bg-leaf text-white' },
 ];
 
 interface TopNavigationProps {
   current: View;
   onNavigate: (view: View) => void;
   streakCount: number;
+  onSignOut?: () => void;
 }
 
-export function TopNavigation({ current, onNavigate, streakCount }: TopNavigationProps) {
+export function TopNavigation({ current, onNavigate, streakCount, onSignOut }: TopNavigationProps) {
   return (
     <header className="sticky top-0 z-40 border-b-3 border-ink bg-yellow-300/95 backdrop-blur-sm">
       <div className="mx-auto flex max-w-[1440px] items-center gap-4 px-4 py-3 md:px-7">
         <div className="hidden shrink-0 items-center gap-2 sm:flex">
-          <div className="flex h-10 w-10 -skew-x-6 items-center justify-center border-2 border-ink bg-yellow-400 shadow-panelSm">
-            <span className="skew-x-6 font-display text-xl text-ink">D</span>
-          </div>
+          <img src="/daysona-logo.png" alt="DaySona" className="h-10 w-10 border-2 border-ink object-cover shadow-panelSm" />
           <div className="hidden lg:block">
             <h1 className="font-display text-lg leading-none">DAYSONA</h1>
             <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-ink/50">New round / new day</p>
@@ -61,6 +61,18 @@ export function TopNavigation({ current, onNavigate, streakCount }: TopNavigatio
             );
           })}
         </nav>
+        {onSignOut && (
+          <button
+            type="button"
+            onClick={onSignOut}
+            aria-label="Sign out"
+            title="Sign out"
+            className="btn-press flex shrink-0 items-center justify-center gap-2 border-2 border-ink bg-white px-2.5 py-2 font-display text-[10px] uppercase hover:bg-cream2 sm:px-3"
+          >
+            <LogOut size={16} strokeWidth={2.5} />
+            <span className="hidden xl:inline">Sign out</span>
+          </button>
+        )}
       </div>
     </header>
   );

@@ -4,31 +4,38 @@ import { useApp } from '@/context/AppContext';
 import { ProgressBar } from '@/components/ProgressBar';
 import { EmptyState } from '@/components/EmptyState';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { CategoryBar } from '@/components/CategoryBar';
+import { CategoryAssigner } from '@/components/CategoryAssigner';
 import { LongTermGoal } from '@/types';
 
 export function LongTermView() {
   const {
     data, addLongTerm, updateLongTerm, deleteLongTerm,
-    addMilestone, toggleMilestone, deleteMilestone,
+    addMilestone, toggleMilestone, deleteMilestone, addCategory, deleteCategory,
   } = useApp();
 
   const [showForm, setShowForm] = useState(false);
   const [formTitle, setFormTitle] = useState('');
   const [formDesc, setFormDesc] = useState('');
   const [formDate, setFormDate] = useState('');
+  const [formCategory, setFormCategory] = useState<string | undefined>();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDesc, setEditDesc] = useState('');
   const [editDate, setEditDate] = useState('');
+  const [editCategory, setEditCategory] = useState<string | undefined>();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [newMilestone, setNewMilestone] = useState('');
   const [milestoneGoalId, setMilestoneGoalId] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const goals = selectedCategory ? data.longTerm.filter(goal => goal.category === selectedCategory) : data.longTerm;
 
   const handleAdd = () => {
     if (!formTitle.trim()) return;
-    addLongTerm(formTitle, formDesc, formDate);
+    addLongTerm(formTitle, formDesc, formDate, formCategory);
     setFormTitle(''); setFormDesc(''); setFormDate('');
+    setFormCategory(undefined);
     setShowForm(false);
   };
 
@@ -37,6 +44,7 @@ export function LongTermView() {
     setEditTitle(g.title);
     setEditDesc(g.description);
     setEditDate(g.targetDate || '');
+    setEditCategory(g.category);
   };
 
   const commitEdit = () => {
@@ -45,6 +53,7 @@ export function LongTermView() {
         title: editTitle.trim(),
         description: editDesc.trim(),
         targetDate: editDate || undefined,
+        category: editCategory,
       });
     }
     setEditingId(null);
@@ -67,7 +76,7 @@ export function LongTermView() {
           </div>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => { const next = !showForm; setShowForm(next); if (next) setFormCategory(selectedCategory || undefined); }}
           className="btn-press flex items-center gap-1 border-2 border-ink bg-leaf px-3 py-2 font-display text-xs uppercase tracking-wider text-white hover:bg-leafDark"
         >
           <Plus size={14} strokeWidth={3} /> Add Goal
@@ -102,38 +111,41 @@ export function LongTermView() {
             />
             <span className="font-mono text-xs text-ink/40">Target date (optional)</span>
           </div>
-          <div className="flex justify-end gap-2">
-            <button onClick={() => setShowForm(false)} className="btn-press border-2 border-ink bg-cream2 px-3 py-2 font-display text-xs uppercase">
-              Cancel
-            </button>
-            <button
-              onClick={handleAdd}
-              disabled={!formTitle.trim()}
-              className="btn-press border-2 border-ink bg-leaf px-4 py-2 font-display text-xs uppercase text-white disabled:opacity-40 hover:bg-leafDark"
-            >
-              Create Goal
-            </button>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CategoryAssigner categories={data.categories} categoryColors={data.categoryColors} category={formCategory} onChange={setFormCategory} />
+            <div className="flex gap-2">
+              <button onClick={() => setShowForm(false)} className="btn-press border-2 border-ink bg-cream2 px-3 py-2 font-display text-xs uppercase">
+                Cancel
+              </button>
+              <button
+                onClick={handleAdd}
+                disabled={!formTitle.trim()}
+                className="btn-press border-2 border-ink bg-leaf px-4 py-2 font-display text-xs uppercase text-white disabled:opacity-40 hover:bg-leafDark"
+              >
+                Create Goal
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Goals */}
-      {data.longTerm.length === 0 && !showForm ? (
+      {goals.length === 0 && !showForm ? (
         <EmptyState
-          title="No long-term goals yet"
-          subtitle="What do you want to achieve over time? Add your first goal."
+          title={selectedCategory ? `No ${selectedCategory} goals yet` : 'No long-term goals yet'}
+          subtitle={selectedCategory ? 'Add a goal here or choose another category.' : 'What do you want to achieve over time? Add your first goal.'}
           icon={<Target size={32} strokeWidth={1.5} />}
           color="bg-leaf/10"
         />
       ) : (
         <div className="space-y-4">
-          {data.longTerm.map(g => {
+          {goals.map(g => {
             const expanded = expandedId === g.id;
             const editing = editingId === g.id;
             return (
-              <div key={g.id} className="card-lift overflow-hidden border-2 border-ink bg-cream shadow-panelSm animate-slideUp">
+              <div key={g.id} className="subtle-checker-bg card-lift overflow-hidden border-2 border-ink bg-cream shadow-panelSm animate-slideUp">
                 {/* Accent strip */}
-                <div className="h-1.5 bg-leaf" />
+                <div className="h-1.5" style={{ backgroundColor: g.category ? data.categoryColors[g.category] || '#ffd23f' : '#52b788' }} />
                 <div className="p-4">
                   {editing ? (
                     <div className="space-y-2">
@@ -159,13 +171,16 @@ export function LongTermView() {
                           className="border-2 border-leaf bg-cream2 px-3 py-1.5 font-mono text-xs focus:outline-none"
                         />
                       </div>
-                      <div className="flex justify-end gap-2">
-                        <button onClick={() => setEditingId(null)} className="btn-press border-2 border-ink bg-cream2 px-3 py-1.5 font-display text-xs uppercase">
-                          <X size={12} strokeWidth={3} className="mr-1 inline" />Cancel
-                        </button>
-                        <button onClick={commitEdit} className="btn-press border-2 border-ink bg-leaf px-3 py-1.5 font-display text-xs uppercase text-white">
-                          <Check size={12} strokeWidth={3} className="mr-1 inline" />Save
-                        </button>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <CategoryAssigner categories={data.categories} categoryColors={data.categoryColors} category={editCategory} onChange={setEditCategory} />
+                        <div className="flex gap-2">
+                          <button onClick={() => { setEditingId(null); setEditCategory(undefined); }} className="btn-press border-2 border-ink bg-cream2 px-3 py-1.5 font-display text-xs uppercase">
+                            <X size={12} strokeWidth={3} className="mr-1 inline" />Cancel
+                          </button>
+                          <button onClick={commitEdit} className="btn-press border-2 border-ink bg-leaf px-3 py-1.5 font-display text-xs uppercase text-white">
+                            <Check size={12} strokeWidth={3} className="mr-1 inline" />Save
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -275,6 +290,8 @@ export function LongTermView() {
           })}
         </div>
       )}
+
+      <CategoryBar categories={data.categories} categoryColors={data.categoryColors} selectedCategory={selectedCategory} onSelect={category => { setSelectedCategory(category); setFormCategory(category || undefined); }} onAdd={addCategory} onDelete={category => { deleteCategory(category); if (formCategory === category) setFormCategory(undefined); if (editCategory === category) setEditCategory(undefined); }} />
 
       <ConfirmDialog
         open={!!deleteId}

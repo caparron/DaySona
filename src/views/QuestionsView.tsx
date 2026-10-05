@@ -45,7 +45,7 @@ export function QuestionsView() {
     <div className="mx-auto max-w-3xl">
       <div className="mb-5 flex items-end justify-between">
         <div>
-          <h1 className="font-display text-3xl uppercase leading-none text-goldDark">Questions</h1>
+          <h1 className="font-display text-3xl uppercase leading-none text-ink">Questions</h1>
           <p className="mt-1 font-mono text-xs text-ink/50">{openCount} open — things to figure out</p>
         </div>
         <div className="flex h-10 w-10 animate-floatY items-center justify-center border-2 border-ink bg-gold shadow-panelSm">
@@ -67,7 +67,7 @@ export function QuestionsView() {
       )}
 
       {/* New question — sticky note style */}
-      <div className="mb-5 border-2 border-ink bg-gold/15 shadow-panelSm">
+      <div className="checker-fill-bg mb-5 border-2 border-ink bg-gold/15 shadow-panelSm">
         <div className="flex items-center gap-2 border-b-2 border-gold/40 bg-gold/10 px-4 py-2">
           <Lightbulb size={14} strokeWidth={2.5} className="text-goldDark" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-ink/50">New Question</span>

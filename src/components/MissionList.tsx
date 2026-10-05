@@ -1,12 +1,37 @@
 import { useState, useRef, useEffect } from 'react';
-import { Check, Trash2, Pencil, Plus, Target, GripVertical } from 'lucide-react';
+import { Check, Trash2, Pencil, Plus, Target, GripVertical, Trophy, ImagePlus, X, Brain } from 'lucide-react';
 import { Mission } from '@/types';
 import { useApp } from '@/context/AppContext';
 import { ProgressBar } from '@/components/ProgressBar';
 import { EmptyState } from '@/components/EmptyState';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { CategoryBar } from '@/components/CategoryBar';
+import { CategoryAssigner } from '@/components/CategoryAssigner';
 import { todayKey } from '@/utils/date';
 import { getMissionWeight, getDayProgress } from '@/utils/weights';
+
+function compressAchievementPhoto(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Could not read this photo.'));
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = () => reject(new Error('This file is not a supported image.'));
+      image.onload = () => {
+        const scale = Math.min(1, 1200 / Math.max(image.width, image.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(image.width * scale));
+        canvas.height = Math.max(1, Math.round(image.height * scale));
+        const context = canvas.getContext('2d');
+        if (!context) return reject(new Error('Could not prepare this photo.'));
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.78));
+      };
+      image.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 interface MissionListProps {
   dateKey: string;
@@ -15,7 +40,7 @@ interface MissionListProps {
 
 export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
   const {
-    data, addMission, toggleMission, editMission, deleteMission,
+    data, addMission, setMissionCategory, addCategory, deleteCategory, toggleMission, editMission, deleteMission, addAchievement, addThought,
     setMissionImportance, setSuccessThreshold,
     firstCompletionToday, clearFirstCompletion,
   } = useApp();
@@ -23,19 +48,31 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
   const [newTitle, setNewTitle] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [editCategory, setEditCategory] = useState<string | undefined>();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showThreshold, setShowThreshold] = useState(false);
+  const [pendingAchievement, setPendingAchievement] = useState<Mission | null>(null);
+  const [dayReflectionPending, setDayReflectionPending] = useState(false);
+  const [showDayReflection, setShowDayReflection] = useState(false);
+  const [dayReflectionContent, setDayReflectionContent] = useState('');
+  const [achievementPhoto, setAchievementPhoto] = useState<string | undefined>();
+  const [photoError, setPhotoError] = useState('');
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [newMissionCategory, setNewMissionCategory] = useState<string | undefined>();
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const allMissions = data.missions;
-  const missions = data.missions.filter(m => m.date === dateKey);
+  const dateMissions = data.missions.filter(m => m.date === dateKey);
+  const missions = selectedCategory && !readOnly ? dateMissions.filter(m => m.category === selectedCategory) : dateMissions;
   const completed = missions.filter(m => m.done).length;
   const total = missions.length;
   const isToday = dateKey === todayKey();
 
-  const dayProgress = getDayProgress(missions, allMissions);
+  const dayProgress = getDayProgress(dateMissions, allMissions);
   const threshold = data.successThreshold;
   const isSuccessful = dayProgress >= threshold;
 
@@ -43,28 +80,35 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
     if (firstCompletionToday && isToday) {
       setShowConfetti(true);
       clearFirstCompletion();
-      const t = setTimeout(() => setShowConfetti(false), 1000);
-      return () => clearTimeout(t);
     }
   }, [firstCompletionToday, isToday, clearFirstCompletion]);
 
+  useEffect(() => {
+    if (!showConfetti) return;
+    const timeout = setTimeout(() => setShowConfetti(false), 1000);
+    return () => clearTimeout(timeout);
+  }, [showConfetti]);
+
   const handleAdd = () => {
     if (!newTitle.trim()) return;
-    addMission(newTitle, dateKey);
+    addMission(newTitle, dateKey, !readOnly ? newMissionCategory : undefined);
     setNewTitle('');
   };
 
   const startEdit = (m: Mission) => {
     setEditingId(m.id);
     setEditValue(m.title);
+    setEditCategory(m.category);
   };
 
   const commitEdit = () => {
     if (editingId && editValue.trim()) {
       editMission(editingId, editValue);
+      setMissionCategory(editingId, editCategory);
     }
     setEditingId(null);
     setEditValue('');
+    setEditCategory(undefined);
   };
 
   const confirmDelete = () => {
@@ -72,6 +116,70 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
       deleteMission(deleteId);
       setDeleteId(null);
     }
+  };
+
+  const handleToggle = (mission: Mission) => {
+    toggleMission(mission.id);
+    if (!mission.done) {
+      const isFinalMission = isToday && dateMissions.length > 0 && dateMissions.every(item => item.id === mission.id || item.done);
+      setDayReflectionPending(isFinalMission);
+      setPendingAchievement(mission);
+      setAchievementPhoto(undefined);
+      setPhotoError('');
+    }
+  };
+
+  const closeAchievementPopup = () => {
+    setPendingAchievement(null);
+    setAchievementPhoto(undefined);
+    if (dayReflectionPending) {
+      setDayReflectionPending(false);
+      setShowDayReflection(true);
+    }
+  };
+
+  const handleAchievementPhoto = async (file?: File) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setPhotoError('Choose an image file.');
+      return;
+    }
+    try {
+      setPhotoError('');
+      setUploadingPhoto(true);
+      const photo = await compressAchievementPhoto(file);
+      setAchievementPhoto(photo);
+      if (pendingAchievement) {
+        addAchievement({
+          missionId: pendingAchievement.id,
+          title: pendingAchievement.title,
+          userName: data.profile?.name || 'Player',
+          date: pendingAchievement.date,
+          photo,
+          category: pendingAchievement.category,
+          categoryColor: pendingAchievement.category ? data.categoryColors[pendingAchievement.category] : undefined,
+        });
+        closeAchievementPopup();
+      }
+    } catch {
+      setPhotoError('Could not add that photo. Try another one.');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const saveAchievement = () => {
+    if (!pendingAchievement) return;
+    addAchievement({
+      missionId: pendingAchievement.id,
+      title: pendingAchievement.title,
+      userName: data.profile?.name || 'Player',
+      date: pendingAchievement.date,
+      photo: achievementPhoto,
+      category: pendingAchievement.category,
+      categoryColor: pendingAchievement.category ? data.categoryColors[pendingAchievement.category] : undefined,
+    });
+    closeAchievementPopup();
   };
 
   return (
@@ -174,35 +282,40 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
           >
             <Plus size={14} strokeWidth={3} /> Add
           </button>
+          <CategoryAssigner categories={data.categories} categoryColors={data.categoryColors} category={newMissionCategory} onChange={setNewMissionCategory} />
         </div>
       )}
 
       {/* Mission list */}
       {missions.length === 0 ? (
         <EmptyState
-          title={isToday ? 'What do you want to accomplish today?' : 'No missions this day'}
-          subtitle={isToday ? 'Add your first goal and start your day.' : 'This day was quiet.'}
+          title={selectedCategory && !readOnly ? `No ${selectedCategory} missions this day` : isToday ? 'What do you want to accomplish today?' : 'No missions this day'}
+          subtitle={selectedCategory && !readOnly ? 'Add a mission here or choose another category.' : isToday ? 'Add your first goal and start your day.' : 'This day was quiet.'}
           icon={<Plus size={32} strokeWidth={2} />}
         />
       ) : (
         <div className="space-y-2">
-          {missions.map(m => {
+          {missions.map((m, index) => {
             const weight = getMissionWeight(m, allMissions);
             const isCustom = m.importance >= 0;
             const expanded = expandedId === m.id;
             return (
               <div
                 key={m.id}
-                className={`group border-2 border-ink p-3 transition-all duration-200 animate-slideInLeft ${
+                className={`mission-row group border-2 border-ink p-3 transition-all duration-200 animate-slideInLeft ${
                   m.done ? 'bg-leaf/15' : 'bg-cream'
                 }`}
+                style={{
+                  animationDelay: `${index * 45}ms`,
+                  ...(m.category ? { borderLeftWidth: '6px', borderLeftColor: data.categoryColors[m.category] || '#ffd23f' } : {}),
+                }}
               >
                 <div className="flex items-center gap-3">
                   {/* Circular checkbox */}
                   <button
-                    onClick={() => !readOnly && toggleMission(m.id)}
+                    onClick={() => !readOnly && handleToggle(m)}
                     disabled={readOnly}
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-ink transition-all ${
+                    className={`mission-check flex h-8 w-8 shrink-0 items-center justify-center border-2 border-ink transition-all ${
                       m.done ? 'animate-checkPop bg-leaf' : 'bg-cream hover:bg-cream2'
                     } ${readOnly ? 'cursor-default' : 'cursor-pointer'}`}
                   >
@@ -219,7 +332,6 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
                         if (e.key === 'Enter') commitEdit();
                         if (e.key === 'Escape') setEditingId(null);
                       }}
-                      onBlur={commitEdit}
                       autoFocus
                       className="flex-1 border-b-2 border-coral bg-transparent font-body text-sm focus:outline-none"
                     />
@@ -247,7 +359,7 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
                   </button>
 
                   {/* Actions */}
-                  {!readOnly && (
+                  {!readOnly && editingId !== m.id && (
                     <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                       <button
                         onClick={() => startEdit(m)}
@@ -264,6 +376,16 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
                     </div>
                   )}
                 </div>
+
+                {!readOnly && editingId === m.id && (
+                  <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-ink/10 pt-2">
+                    <CategoryAssigner categories={data.categories} categoryColors={data.categoryColors} category={editCategory} onChange={setEditCategory} />
+                    <div className="flex gap-1">
+                      <button type="button" onClick={() => { setEditingId(null); setEditValue(''); setEditCategory(undefined); }} className="border border-ink/20 p-1.5 hover:bg-cream2" aria-label="Cancel mission edit"><X size={14} /></button>
+                      <button type="button" onClick={commitEdit} disabled={!editValue.trim()} className="border border-ink/20 p-1.5 text-leafDark hover:bg-leaf/10 disabled:opacity-40" aria-label="Save mission edit"><Check size={14} strokeWidth={3} /></button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Importance slider (expanded) */}
                 {expanded && !readOnly && (
@@ -317,6 +439,10 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
         </p>
       )}
 
+      {!readOnly && (
+        <CategoryBar categories={data.categories} categoryColors={data.categoryColors} selectedCategory={selectedCategory} onSelect={category => { setSelectedCategory(category); setNewMissionCategory(category || undefined); }} onAdd={addCategory} onDelete={category => { deleteCategory(category); if (newMissionCategory === category) setNewMissionCategory(undefined); if (editCategory === category) setEditCategory(undefined); }} />
+      )}
+
       <ConfirmDialog
         open={!!deleteId}
         title="Delete mission?"
@@ -324,6 +450,74 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
         onConfirm={confirmDelete}
         onCancel={() => setDeleteId(null)}
       />
+
+      {pendingAchievement && (
+        <div className="achievement-overlay fixed inset-0 z-[100] flex items-center justify-center bg-ink/60 p-4" role="presentation">
+          <section role="dialog" aria-modal="true" aria-labelledby="achievement-title" className="achievement-popup w-full max-w-md border-3 border-ink bg-leaf/15 p-5 shadow-panelLg md:p-7">
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center border-2 border-ink bg-leaf text-white shadow-panelSm">
+                <Trophy size={25} strokeWidth={2.5} />
+              </div>
+              <button type="button" onClick={closeAchievementPopup} aria-label="Close congratulations" className="border-2 border-ink bg-white p-2 hover:bg-cream2">
+                <X size={18} strokeWidth={2.5} />
+              </button>
+            </div>
+            <p className="font-mono text-[10px] uppercase tracking-[.2em] text-leafDark">Mission complete!</p>
+            <h2 id="achievement-title" className="mt-2 font-display text-2xl leading-tight md:text-3xl">You did it, {data.profile?.name || 'friend'}!</h2>
+            <p className="mt-2 border-l-4 border-leaf pl-3 font-body text-sm text-ink/75">{pendingAchievement.title}</p>
+
+            {achievementPhoto && <img src={achievementPhoto} alt="Selected achievement" className="mt-4 max-h-48 w-full border-2 border-ink object-cover" />}
+            {photoError && <p role="alert" className="mt-2 font-mono text-xs text-coralDark">{photoError}</p>}
+            <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={event => { void handleAchievementPhoto(event.target.files?.[0]); event.target.value = ''; }} />
+
+            <div className="mt-6 grid gap-2 sm:grid-cols-3">
+              <button type="button" onClick={saveAchievement} className="btn-press border-2 border-ink bg-leaf px-3 py-3 font-display text-[10px] uppercase text-white hover:bg-leafDark">Save to achievements</button>
+              <button type="button" disabled={uploadingPhoto} onClick={() => photoInputRef.current?.click()} className="btn-press flex items-center justify-center gap-1 border-2 border-ink bg-white px-3 py-3 font-display text-[10px] uppercase hover:bg-cream2 disabled:opacity-60"><ImagePlus size={15} /> {uploadingPhoto ? 'Adding photo…' : 'Upload photo & post'}</button>
+              <button type="button" onClick={closeAchievementPopup} className="btn-press border-2 border-ink bg-cream2 px-3 py-3 font-display text-[10px] uppercase hover:bg-white">Close</button>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {showDayReflection && (
+        <div className="achievement-overlay fixed inset-0 z-[110] flex items-center justify-center bg-ink/60 p-4" role="presentation">
+          <section role="dialog" aria-modal="true" aria-labelledby="day-complete-title" className="achievement-popup paper-lined subtle-checker-bg w-full max-w-lg overflow-hidden border-3 border-ink bg-[#fef9ef] shadow-panelLg">
+            <div className="flex items-center gap-2 border-b-2 border-sky/30 bg-sky/8 px-4 py-3">
+              <div className="h-3 w-3 rounded-full border border-ink/30 bg-coral/40" />
+              <div className="h-3 w-3 rounded-full border border-ink/30 bg-gold/50" />
+              <div className="h-3 w-3 rounded-full border border-ink/30 bg-leaf/40" />
+              <span className="ml-2 flex-1 font-mono text-[10px] uppercase tracking-widest text-ink/50">Day complete</span>
+              <button type="button" onClick={() => { setShowDayReflection(false); setDayReflectionContent(''); }} aria-label="Close day reflection" className="border-2 border-ink bg-white p-1.5 hover:bg-cream2"><X size={16} /></button>
+            </div>
+            <div className="p-5 md:p-7">
+              <div className="mb-3 flex items-center gap-2 text-leafDark"><Brain size={20} /><span className="font-mono text-[10px] uppercase tracking-[.18em]">Every mission complete</span></div>
+              <h2 id="day-complete-title" className="font-display text-2xl uppercase md:text-3xl">You finished your day!</h2>
+              <p className="mt-2 font-body text-sm text-ink/70">Want to reflect on your day or write down what you’ll do next?</p>
+              <textarea
+                autoFocus
+                value={dayReflectionContent}
+                onChange={event => setDayReflectionContent(event.target.value)}
+                onKeyDown={event => { if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) { if (dayReflectionContent.trim()) { addThought(dayReflectionContent); setDayReflectionContent(''); setShowDayReflection(false); } } }}
+                placeholder="Today I felt… / Next, I want to…"
+                rows={4}
+                className="mt-4 w-full resize-none border-0 bg-transparent px-1 py-2 font-body text-base leading-7 text-ink/90 placeholder:text-ink/35 focus:outline-none"
+                style={{ lineHeight: '28px' }}
+              />
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t-2 border-sky/30 pt-3">
+                <button type="button" onClick={() => { setShowDayReflection(false); setDayReflectionContent(''); }} className="font-mono text-[10px] uppercase tracking-wider text-ink/55 underline hover:text-ink">Not now</button>
+                <button
+                  type="button"
+                  disabled={!dayReflectionContent.trim()}
+                  onClick={() => { addThought(dayReflectionContent); setDayReflectionContent(''); setShowDayReflection(false); }}
+                  className="btn-press flex items-center gap-1.5 border-2 border-ink bg-sky px-4 py-2 font-display text-xs uppercase tracking-wider text-white disabled:opacity-40 hover:bg-skyDark"
+                >
+                  <Plus size={14} strokeWidth={3} /> Submit to Thoughts
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

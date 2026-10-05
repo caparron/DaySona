@@ -48,7 +48,7 @@ body {
   border: 2px solid #f5eddd;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #ff4f3a;
+  background: #eef114;
 }
 
 /* Utility classes */
@@ -75,51 +75,216 @@ body {
 .mission-checker-bg::before {
   content: '';
   position: absolute;
-  inset: -120px;
+  inset: -55%;
   z-index: -1;
   transform: rotate(-20deg);
   background-image: conic-gradient(#edeef1 25%, #fff 0 50%, #f1f2f5 0 75%, #fff 0);
   background-size: 20px 20px;
 }
+.onboarding-checker {
+  background-image: conic-gradient(#1a1a1a 25%, transparent 0 50%, #1a1a1a 0 75%, transparent 0);
+  background-size: 24px 24px;
+  transform: rotate(12deg);
+}
+.subtle-checker-bg {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.subtle-checker-bg::before {
+  content: '';
+  position: absolute;
+  inset: -55%;
+  z-index: -1;
+  transform: rotate(-18deg);
+  opacity: .32;
+  background-image: conic-gradient(rgba(77, 88, 101, .2) 25%, transparent 0 50%, rgba(77, 88, 101, .2) 0 75%, transparent 0);
+  background-size: 18px 18px;
+}
 
-/* Manga-inspired hard shadows and quick panel motion */
+.checker-fill-bg {
+  background-image: conic-gradient(rgba(77, 88, 101, .2) 25%, transparent 0 50%, rgba(77, 88, 101, .2) 0 75%, transparent 0);
+  background-size: 18px 18px;
+}
+
 .manga-panel {
   outline: 1px solid #1a1a1a;
   outline-offset: 2px;
-  box-shadow: 7px 7px 0 #1a1a1a !important;
-  transform: rotate(-0.55deg);
+  box-shadow: 8px 8px 0 #1a1a1a !important;
+  transform: rotate(-0.35deg);
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
 .manga-panel:hover {
   transform: rotate(0deg) translateY(-2px);
-  box-shadow: 9px 9px 0 #1a1a1a !important;
+  box-shadow: 10px 10px 0 #1a1a1a !important;
 }
-.page-hero {
-  position: relative;
+.today-page {
+  display: grid;
+  gap: 1.5rem;
 }
-.page-hero-icon {
+.today-top-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+}
+.today-hero {
+  min-height: 300px;
+  animation: todayReveal 480ms cubic-bezier(.2,.8,.2,1) both;
+}
+.today-side-column {
+  display: grid;
+  align-content: stretch;
+  gap: 1.25rem;
+  animation: todayReveal 560ms cubic-bezier(.2,.8,.2,1) both;
+}
+.today-streak-panel {
+  min-height: 88px;
+}
+.today-missions {
+  animation: todayReveal 620ms cubic-bezier(.2,.8,.2,1) both;
+}
+.today-bottom-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 1.25rem;
+}
+.today-shortcuts {
+  display: grid;
+  gap: .85rem;
+}
+.today-shortcut {
   display: flex;
-  width: 2.75rem;
-  height: 2.75rem;
+  min-height: 76px;
+  align-items: center;
+  gap: .8rem;
+  border: 2px solid #1a1a1a;
+  background: #fff;
+  padding: .75rem .9rem;
+  text-align: left;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+.today-shortcut:hover {
+  transform: translate(-2px, -2px) skewX(-.5deg);
+  background: #fffdf5;
+  box-shadow: 6px 6px 0 #1a1a1a;
+}
+.today-shortcut:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #1a1a1a;
+}
+.today-shortcut:focus-visible {
+  outline: 3px solid #ff4f3a;
+  outline-offset: 3px;
+}
+.today-shortcut-icon {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   border: 2px solid #1a1a1a;
-  background: #facc15;
-  color: #1a1a1a;
-  box-shadow: 3px 3px 0 #1a1a1a;
-  transform: skewX(-7deg);
+  background: #ffd23f;
+  box-shadow: 2px 2px 0 #1a1a1a;
 }
-.manga-enter {
-  animation: mangaEnter 420ms cubic-bezier(.2,.8,.2,1) both;
+.mission-row {
+  box-shadow: 3px 3px 0 rgba(26,26,26,.85);
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
 }
-@keyframes mangaEnter {
-  from { opacity: 0; translate: 0 12px; }
+.mission-row:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 #1a1a1a;
+}
+.mission-check {
+  border-radius: 0;
+  box-shadow: 2px 2px 0 #1a1a1a;
+  transform: rotate(-2deg);
+}
+.mission-check:hover {
+  transform: rotate(2deg) scale(1.06);
+}
+.mission-check:focus-visible {
+  outline: 3px solid #ff4f3a;
+  outline-offset: 3px;
+}
+.achievement-overlay {
+  animation: achievementFadeIn 180ms ease-out both;
+  backdrop-filter: blur(3px);
+}
+.achievement-popup {
+  border-radius: 1.25rem 0.25rem 1.25rem 0.25rem;
+  background-image: linear-gradient(135deg, rgba(255,255,255,.94), rgba(220,252,231,.98));
+  animation: achievementPop 420ms cubic-bezier(.2,1.35,.45,1) both;
+}
+.achievement-post {
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.achievement-post:hover {
+  transform: translateY(-3px) rotate(-.25deg);
+  box-shadow: 10px 10px 0 #1a1a1a !important;
+}
+@keyframes achievementFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes achievementPop {
+  0% { opacity: 0; transform: translateY(20px) scale(.72) rotate(-3deg); }
+  68% { opacity: 1; transform: translateY(-4px) scale(1.04) rotate(.5deg); }
+  100% { transform: translateY(0) scale(1) rotate(0); }
+}
+
+@keyframes confettiBurst {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) rotate(140deg) scale(.25); }
+}
+@keyframes todayReveal {
+  from { opacity: 0; translate: 0 14px; }
   to { opacity: 1; translate: 0 0; }
 }
+@media (min-width: 1024px) {
+  .today-top-grid {
+    grid-template-columns: minmax(0, 1.7fr) minmax(300px, .8fr);
+    gap: 1.5rem;
+  }
+  .today-side-column {
+    align-content: start;
+    grid-template-rows: auto auto;
+  }
+  .today-streak-panel {
+    align-self: start;
+  }
+  .today-bottom-grid {
+    grid-template-columns: minmax(0, 1.7fr) minmax(260px, .8fr);
+    gap: 1.5rem;
+  }
+  .today-shortcuts {
+    grid-template-rows: repeat(4, minmax(76px, 1fr));
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .manga-enter { animation: none; }
-  .manga-panel { transition: none; }
+  .manga-panel,
+  .mission-row {
+    transition: none;
+  }
+  .today-shortcut {
+    transition: none;
+  }
+  .today-hero,
+  .today-side-column,
+  .today-missions {
+    animation: none;
+  }
+  .achievement-overlay,
+  .achievement-popup,
+  .achievement-post {
+    animation: none;
+    transition: none;
+  }
+  .confetti-dot {
+    display: none;
+  }
 }
 
 .skew-tag {
