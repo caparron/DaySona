@@ -1,14 +1,18 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
-import { AppData, Mission, LongTermGoal, Achievement } from '@/types';
+import { AppData, Mission, LongTermGoal, Achievement, AgendaItem } from '@/types';
 import { emptyData } from '@/types';
 import { hasLocalData, loadData, saveData } from '@/utils/storage';
 import { supabase } from '@/utils/supabase';
 import { todayKey } from '@/utils/date';
 import { checkAndBreakStreak, recordCompletion, removeCompletion } from '@/utils/streak';
+import { Language, translate } from '@/utils/i18n';
 
 interface AppContextValue {
   data: AppData;
+  language: Language;
+  t: (text: string) => string;
+  setLanguage: (language: Language) => void;
   session: Session | null;
   authLoading: boolean;
   dataReady: boolean;
@@ -18,7 +22,8 @@ interface AppContextValue {
   retryCloudSync: () => void;
   signOut: () => Promise<void>;
   // Profile
-  setProfile: (name: string, location: string) => void;
+  setProfile: (name: string, location: string, photo?: string, language?: Language) => void;
+  setProfilePhoto: (photo?: string) => void;
   // Missions
   addMission: (title: string, date?: string, category?: string) => void;
   setMissionCategory: (id: string, category?: string) => void;
@@ -41,6 +46,8 @@ interface AppContextValue {
   addLongTerm: (title: string, description: string, targetDate?: string, category?: string) => void;
   updateLongTerm: (id: string, updates: Partial<LongTermGoal>) => void;
   deleteLongTerm: (id: string) => void;
+  addAgendaItem: (item: Omit<AgendaItem, 'id' | 'createdAt'>) => void;
+  deleteAgendaItem: (id: string) => void;
   addMilestone: (goalId: string, title: string) => void;
   toggleMilestone: (goalId: string, milestoneId: string) => void;
   deleteMilestone: (goalId: string, milestoneId: string) => void;
@@ -70,6 +77,7 @@ function normalizeAppData(value: unknown): AppData {
     thoughts: Array.isArray(saved.thoughts) ? saved.thoughts : [],
     questions: Array.isArray(saved.questions) ? saved.questions : [],
     longTerm: Array.isArray(saved.longTerm) ? saved.longTerm : [],
+    agendaItems: Array.isArray(saved.agendaItems) ? saved.agendaItems : [],
     achievements: Array.isArray(saved.achievements) ? saved.achievements : [],
     categories: Array.isArray(saved.categories) ? saved.categories.filter((category): category is string => typeof category === 'string') : [],
     categoryColors: saved.categoryColors && typeof saved.categoryColors === 'object'
@@ -82,6 +90,7 @@ function normalizeAppData(value: unknown): AppData {
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<AppData>(emptyData);
+  const [language, setLanguageState] = useState<Language>('en');
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [dataReady, setDataReady] = useState(false);
@@ -189,6 +198,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
         if (cancelled) return;
         setData({ ...loaded, streak: checkAndBreakStreak(loaded.streak) });
+        if (loaded.profile?.language === 'es' || loaded.profile?.language === 'en') {
+          setLanguageState(loaded.profile.language);
+        }
         setDataUserId(userId);
         setDataReady(true);
         setSyncStatus('synced');
@@ -196,6 +208,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
         const cached = loadData(userId);
         setData({ ...cached, streak: checkAndBreakStreak(cached.streak) });
+        if (cached.profile?.language === 'es' || cached.profile?.language === 'en') {
+          setLanguageState(cached.profile.language);
+        }
         setDataUserId(userId);
         setDataReady(true);
         setSyncStatus('error');
@@ -246,6 +261,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     activeUserId.current = null;
     setSession(null);
     setData(emptyData);
+    setLanguageState('en');
     setDataReady(false);
     setDataUserId(null);
     setSyncStatus('idle');
@@ -253,8 +269,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setFirstCompletionToday(false);
   }, []);
 
-  const setProfile = useCallback((name: string, location: string) => {
-    setData(d => ({ ...d, profile: { name, location } }));
+  const setProfile = useCallback((name: string, location: string, photo?: string, profileLanguage?: Language) => {
+    setData(d => ({ ...d, profile: { ...d.profile, name, location, language: profileLanguage ?? d.profile?.language ?? language, ...(photo ? { photo } : {}) } }));
+  }, [language]);
+
+  const setLanguage = useCallback((nextLanguage: Language) => {
+    setLanguageState(nextLanguage);
+    setData(d => d.profile ? { ...d, profile: { ...d.profile, language: nextLanguage } } : d);
+  }, []);
+
+  const setProfilePhoto = useCallback((photo?: string) => {
+    setData(d => {
+      if (!d.profile) return d;
+      const profile = { ...d.profile };
+      if (photo) profile.photo = photo;
+      else delete profile.photo;
+      return { ...d, profile };
+    });
   }, []);
 
   const addMission = useCallback((title: string, date?: string, category?: string) => {
@@ -414,6 +445,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setData(d => ({ ...d, longTerm: d.longTerm.filter(g => g.id !== id) }));
   }, []);
 
+  const addAgendaItem = useCallback((item: Omit<AgendaItem, 'id' | 'createdAt'>) => {
+    if (!item.title.trim() || !/^\d{2}:\d{2}$/.test(item.startTime)) return;
+    setData(d => ({ ...d, agendaItems: [{ ...item, id: uid(), createdAt: Date.now() }, ...d.agendaItems] }));
+  }, []);
+
+  const deleteAgendaItem = useCallback((id: string) => {
+    setData(d => ({ ...d, agendaItems: d.agendaItems.filter(item => item.id !== id) }));
+  }, []);
+
   const addMilestone = useCallback((goalId: string, title: string) => {
     setData(d => ({
       ...d,
@@ -492,6 +532,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const value: AppContextValue = {
     data,
+    language,
+    t: (text: string) => translate(language, text),
+    setLanguage,
     session,
     authLoading,
     dataReady,
@@ -501,6 +544,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     retryCloudSync,
     signOut,
     setProfile,
+    setProfilePhoto,
     addMission,
     setMissionCategory,
     toggleMission,
@@ -519,6 +563,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     addLongTerm,
     updateLongTerm,
     deleteLongTerm,
+    addAgendaItem,
+    deleteAgendaItem,
     addMilestone,
     toggleMilestone,
     deleteMilestone,

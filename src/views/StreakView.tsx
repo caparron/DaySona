@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Flame, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Tag } from '@/components/Panel';
-import { monthGrid, dateKey as toDateKey, monthLong, parseKey, isToday } from '@/utils/date';
+import { monthGrid, dateKey as toDateKey, monthLong, parseKey, isToday, weekdayShort } from '@/utils/date';
 
 export function StreakView() {
-  const { data } = useApp();
+  const { data, t, language } = useApp();
   const [calMonth, setCalMonth] = useState(() => {
     const d = new Date();
     return { year: d.getFullYear(), month: d.getMonth() };
@@ -27,7 +27,7 @@ export function StreakView() {
     });
   };
 
-  const monthName = monthLong(new Date(calMonth.year, calMonth.month, 1));
+  const monthName = monthLong(new Date(calMonth.year, calMonth.month, 1), language);
   const totalCompleted = data.streak.completedDates.length;
   const monthCompleted = data.streak.completedDates.filter(d => {
     const dt = parseKey(d);
@@ -39,8 +39,8 @@ export function StreakView() {
       <div className="page-hero manga-panel manga-enter mb-6 flex items-center gap-3 border-3 border-ink bg-white p-4 shadow-panel">
         <div className="page-hero-icon"><Flame size={22} strokeWidth={2.7} /></div>
         <div>
-          <h1 className="font-display text-3xl uppercase leading-none text-ink">Streak</h1>
-          <p className="mt-1 font-mono text-xs text-ink/60">{totalCompleted} days completed · Keep your daily consistency going</p>
+          <h1 className="font-display text-3xl uppercase leading-none text-ink">{t('Streak')}</h1>
+          <p className="mt-1 font-mono text-xs text-ink/60">{totalCompleted} {t(totalCompleted === 1 ? 'day completed · Keep your daily consistency going' : 'days completed · Keep your daily consistency going')}</p>
         </div>
       </div>
 
@@ -49,12 +49,12 @@ export function StreakView() {
         <div className="border-2 border-ink bg-ink p-5 text-center shadow-panelSm">
           <Flame size={36} strokeWidth={2.5} className={data.streak.current > 0 ? 'mx-auto animate-streakFlame text-ember' : 'mx-auto text-mist/40'} />
           <p className="mt-2 font-display text-4xl text-cream">{data.streak.current}</p>
-          <p className="mt-1 font-mono text-xs uppercase tracking-wider text-mist">Current Streak</p>
+          <p className="mt-1 font-mono text-xs uppercase tracking-wider text-mist">{t('Current Streak')}</p>
         </div>
         <div className="border-2 border-ink bg-gold p-5 text-center shadow-panelSm">
           <Trophy size={36} strokeWidth={2.5} className="mx-auto text-ink" />
           <p className="mt-2 font-display text-4xl">{data.streak.best}</p>
-          <p className="mt-1 font-mono text-xs uppercase tracking-wider text-ink/70">Best Record</p>
+          <p className="mt-1 font-mono text-xs uppercase tracking-wider text-ink/70">{t('Best Record')}</p>
         </div>
       </div>
 
@@ -65,8 +65,7 @@ export function StreakView() {
             <span className="font-display text-[10px] text-white">!</span>
           </div>
           <p className="text-sm text-ink/70">
-            Complete <strong>at least one mission</strong> in a day to keep your streak alive.
-            Miss a full day without completing any mission and the streak resets.
+            {t('Complete at least one mission in a day to keep your streak alive. Miss a full day without completing any mission and the streak resets.')}
           </p>
         </div>
       </div>
@@ -84,7 +83,7 @@ export function StreakView() {
         </div>
 
         <div className="mb-2 grid grid-cols-7 gap-1">
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+          {Array.from({ length: 7 }, (_, i) => weekdayShort(new Date(2024, 0, 7 + i), language)).map((d, i) => (
             <div key={i} className="py-1 text-center font-mono text-[10px] uppercase text-ink/40">{d}</div>
           ))}
         </div>
@@ -115,20 +114,20 @@ export function StreakView() {
         <div className="mt-4 flex items-center justify-between border-t-2 border-ink/10 pt-3">
           <div className="flex items-center gap-3 font-mono text-xs text-ink/60">
             <span className="flex items-center gap-1">
-              <span className="inline-block h-3 w-3 border border-ink bg-leaf" /> Completed
+              <span className="inline-block h-3 w-3 border border-ink bg-leaf" /> {t('Completed')}
             </span>
             <span className="flex items-center gap-1">
-              <span className="inline-block h-3 w-3 border border-coral bg-coral/10" /> Today
+              <span className="inline-block h-3 w-3 border border-coral bg-coral/10" /> {t('Today')}
             </span>
           </div>
-          <Tag color="bg-ember text-white">{monthCompleted} this month</Tag>
+          <Tag color="bg-ember text-white">{monthCompleted} {t('this month')}</Tag>
         </div>
       </div>
 
       {/* Recent completed dates */}
       {data.streak.completedDates.length > 0 && (
         <div className="mt-5">
-          <h3 className="mb-2 font-display text-sm uppercase text-ink/60">Recent Activity</h3>
+          <h3 className="mb-2 font-display text-sm uppercase text-ink/60">{t('Recent Activity')}</h3>
           <div className="flex flex-wrap gap-1.5">
             {[...data.streak.completedDates].reverse().slice(0, 20).map(d => (
               <span key={d} className="border-2 border-ink/30 bg-leaf/15 px-2 py-1 font-mono text-xs">

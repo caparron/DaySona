@@ -1,0 +1,100 @@
+export type Language = 'en' | 'es';
+
+const ES: Record<string, string> = {
+  'Every day is a new round': 'Cada día es una nueva partida',
+  'New round / new day': 'Nueva partida / nuevo día',
+  'Small steps. Bigger days.': 'Pequeños pasos. Grandes días.',
+  'YOUR NEXT ROUND STARTS HERE': 'TU PRÓXIMA PARTIDA EMPIEZA ACÁ',
+  'Make progress feel like play.': 'Que progresar se sienta como jugar.',
+  'Keep your daily missions, questions, thoughts, and bigger goals together. Your progress follows your account across devices.': 'Reuní tus misiones, preguntas, pensamientos y metas. Tu progreso acompaña tu cuenta en todos tus dispositivos.',
+  'DAILY MISSIONS': 'MISIONES DIARIAS', STREAKS: 'RACHAS', ACHIEVEMENTS: 'LOGROS',
+  'PROFILE SETUP': 'CONFIGURAR PERFIL', 'PLAYER ACCESS': 'ACCESO DE JUGADOR', 'Secure account': 'Cuenta segura',
+  'Create account': 'Crear cuenta', 'Sign in': 'Iniciar sesión', 'Create your account': 'Creá tu cuenta', 'Welcome back': 'Qué bueno verte de nuevo',
+  Email: 'Correo electrónico', Password: 'Contraseña', 'At least 6 characters': 'Al menos 6 caracteres',
+  'Please wait…': 'Un momento…', 'Account created. Check your email to confirm it, then sign in.': 'Cuenta creada. Revisá tu correo para confirmarla y después iniciá sesión.',
+  'Account created. Let’s set up your profile.': 'Cuenta creada. Ahora configuremos tu perfil.',
+  'What should we call you?': '¿Cómo querés que te llamemos?', 'Your name or nickname': 'Tu nombre o apodo',
+  'Profile photo': 'Foto de perfil', '(optional)': '(opcional)', 'Add profile photo': 'Agregar foto de perfil', 'Change photo': 'Cambiar foto', 'Images are resized before they sync to your account.': 'La imagen se ajusta antes de sincronizarse con tu cuenta.',
+  'Where are you? (for weather)': '¿Dónde estás? (para el clima)', 'City name, e.g. Tokyo, Madrid, New York': 'Ciudad, por ejemplo: Buenos Aires, Madrid, Ciudad de México',
+  'We’ll fetch local weather. You can skip this and change it later.': 'Buscaremos el clima local. Podés saltear este paso y cambiarlo después.', Back: 'Volver', 'Start Playing': 'Empezar a jugar',
+  'Your profile and progress sync with your account.': 'Tu perfil y progreso se sincronizan con tu cuenta.', 'Sign in on another device to pick up where you left off.': 'Iniciá sesión en otro dispositivo para continuar donde quedaste.',
+  'Good morning': 'Buenos días', 'Good afternoon': 'Buenas tardes', 'Good night': 'Buenas noches',
+  'DAY STREAK': 'DÍAS DE RACHA', 'Keep it going. Complete one mission today.': '¡No la cortes! Completá una misión hoy.', Best: 'Récord',
+  "Today's Missions": 'Misiones de hoy', 'Check off your daily panels': 'Completá tus misiones del día', 'Quick access': 'Acceso rápido', Calendar: 'Calendario', 'Review any day': 'Repasá cualquier día', Questions: 'Preguntas', 'Things to figure out': 'Cosas por resolver', 'Long Term': 'Largo plazo', 'Bigger goals, step by step': 'Metas grandes, paso a paso', Achievements: 'Logros', 'Celebrate your wins': 'Celebrá tus logros',
+  Thoughts: 'Pensamientos', 'New Entry': 'Nueva entrada', "What's on your mind?": '¿Qué tenés en mente?', 'Entry saved!': '¡Entrada guardada!', 'New Thought': 'Nuevo pensamiento', 'No thoughts yet': 'Todavía no hay pensamientos', 'Write down whatever is on your mind.': 'Anotá lo que tengas en mente.', 'Delete thought?': '¿Borrar pensamiento?', 'This entry will be permanently removed.': 'Esta entrada se eliminará definitivamente.', Cancel: 'Cancelar', Save: 'Guardar',
+  Streak: 'Racha', 'Current Streak': 'Racha actual', 'Best Record': 'Mejor marca', 'Complete at least one mission in a day to keep your streak alive. Miss a full day without completing any mission and the streak resets.': 'Completá al menos una misión por día para mantener la racha. Si pasa un día entero sin completar ninguna, la racha se reinicia.', 'Recent Activity': 'Actividad reciente', Completed: 'Completados',
+  Settings: 'Ajustes', PREFERENCES: 'PREFERENCIAS', 'Your profile': 'Tu perfil', Name: 'Nombre', 'Location for weather': 'Ubicación para el clima', 'Save profile': 'Guardar perfil', Saved: 'Guardado', 'Daily success goal': 'Meta diaria de éxito', 'Choose the completion percentage that counts as a successful day.': 'Elegí qué porcentaje de tareas completadas cuenta como un día exitoso.',
+  'Language / Idioma': 'Idioma', English: 'Inglés', Spanish: 'Español', 'Switch language': 'Cambiar idioma',
+  'What % of your day counts as a success?': '¿Qué porcentaje del día cuenta como éxito?', completed: 'completadas', 'Add a mission for today...': 'Agregar misión para hoy...', 'What do you want to accomplish today?': '¿Qué querés lograr hoy?', 'No missions this day': 'No hay misiones para este día', 'Add your first goal and start your day.': 'Agregá tu primera meta y empezá el día.', 'This day was quiet.': 'Este día fue tranquilo.', 'Custom importance': 'Importancia personalizada', 'Auto (even split)': 'Automático (reparto parejo)',
+  'What do you need to figure out?': '¿Qué necesitás resolver?', 'New Question': 'Nueva pregunta', 'No open questions': 'No hay preguntas abiertas', 'No questions to show': 'No hay preguntas para mostrar', "Looks like you're clear for now.": 'Por ahora parece que está todo resuelto.', 'Toggle solved to see history.': 'Marcá como resuelta para ver el historial.', Reopen: 'Reabrir', 'Delete question?': '¿Borrar pregunta?', 'This question will be permanently removed.': 'Esta pregunta se eliminará definitivamente.',
+  'Goal title (e.g. Learn Italian)': 'Nombre de la meta (por ejemplo: aprender italiano)', 'Description (optional)': 'Descripción (opcional)', 'Target date (optional)': 'Fecha objetivo (opcional)', Progress: 'Progreso', 'Add milestone...': 'Agregar hito...', 'No long-term goals yet': 'Todavía no hay metas a largo plazo', 'What do you want to achieve over time? Add your first goal.': '¿Qué querés lograr con el tiempo? Agregá tu primera meta.', 'Add a goal here or choose another category.': 'Agregá una meta acá o elegí otra categoría.', 'Delete goal?': '¿Borrar meta?', 'This long-term goal and all its milestones will be permanently removed.': 'Esta meta y todos sus hitos se eliminarán definitivamente.',
+  'Browse dates and review your daily activity': 'Explorá fechas y repasá tu actividad diaria', Missions: 'Misiones', 'No thoughts this day': 'No hay pensamientos para este día', 'No questions this day': 'No hay preguntas para este día',
+  'YOUR WINS': 'TUS LOGROS', 'Every finished mission deserves a little celebration.': 'Cada misión completada merece un festejo.', 'Your wins will show up here': 'Tus logros van a aparecer acá', 'Finish a mission and save it as an achievement.': 'Completá una misión y guardala como logro.', 'Delete this achievement post?': '¿Borrar esta publicación?', Delete: 'Borrar', 'Delete post': 'Borrar publicación', 'Add photo': 'Agregar foto',
+  'Simulated weather (no live data)': 'Clima simulado (sin datos en vivo)', 'Loading your account…': 'Cargando tu cuenta…', 'Syncing to your account…': 'Sincronizando con tu cuenta…', 'Cloud sync unavailable': 'Sincronización en la nube no disponible', 'Progress saved to your account': 'Progreso guardado en tu cuenta', Retry: 'Reintentar', 'Your account data could not be loaded from Supabase. Changes are kept on this device until sync is restored.': 'No se pudieron cargar los datos de tu cuenta. Los cambios quedan en este dispositivo hasta que se restablezca la sincronización.', 'Sign out': 'Cerrar sesión',
+  'No category selected': 'Sin categoría', 'Show all missions and goals': 'Mostrar todas las misiones y metas', 'Add category': 'Agregar categoría', 'Enter a category name.': 'Escribí un nombre para la categoría.', 'That category already exists.': 'Esa categoría ya existe.', 'e.g. Gym, Study, Social': 'Ej.: Gym, estudio, social', 'Max 20 characters': 'Máximo 20 caracteres', Color: 'Color', 'Choose category color': 'Elegir color de categoría', 'Cancel category creation': 'Cancelar creación de categoría', 'Delete category': 'Borrar categoría', 'None': 'Ninguna', 'Create a category below the panel.': 'Creá una categoría debajo del panel.',
+  'Mission complete!': '¡Misión completada!', 'Save to achievements': 'Guardar en logros', 'Adding photo…': 'Agregando foto…', 'Upload photo & post': 'Subir foto y publicar', Close: 'Cerrar', 'Day complete': 'Día completado', 'Every mission complete': 'Todas las misiones completadas', 'You finished your day!': '¡Terminaste tu día!', 'Want to reflect on your day or write down what you’ll do next?': '¿Querés reflexionar sobre tu día o anotar qué vas a hacer ahora?', 'Today I felt… / Next, I want to…': 'Hoy me sentí… / Ahora quiero…', 'Not now': 'Ahora no', 'Submit to Thoughts': 'Publicar en pensamientos', 'Delete mission?': '¿Borrar misión?', 'This mission will be permanently removed.': 'Esta misión se eliminará definitivamente.',
+};
+
+const ES_MORE: Record<string, string> = {
+  'Cancel mission edit': 'Cancelar edición de misión', 'Save mission edit': 'Guardar edición de misión', 'Close congratulations': 'Cerrar felicitación', 'Close day reflection': 'Cerrar reflexión del día', 'Remove profile photo': 'Quitar foto de perfil',
+  'Enter a category name.': 'Escribí un nombre para la categoría.', 'My profile': 'Mi perfil', 'Language': 'Idioma',
+  'TODAY': 'HOY', 'CALENDAR': 'CALENDARIO', 'THOUGHTS': 'PENSAMIENTOS', 'QUESTIONS': 'PREGUNTAS', 'LONG TERM': 'LARGO PLAZO', 'STREAK': 'RACHA', 'ACHIEVEMENTS': 'LOGROS',
+  'DAY STREAK': 'DÍAS DE RACHA', 'Check off your daily panels': 'Completá tus misiones del día', 'entries': 'entradas', 'Capture and revisit what’s on your mind': 'Anotá y repasá lo que tenés en mente',
+  'days completed · Keep your daily consistency going': 'días completados · Mantené la constancia', 'Today': 'Hoy', 'this month': 'este mes',
+  'Back to Today': 'Volver a hoy', 'This is a future date. You can plan ahead by adding missions below.': 'Esta fecha es futura. Podés planificar agregando misiones abajo.', 'OPEN': 'ABIERTA', 'SOLVED': 'RESUELTA',
+  'Long-term goal date': 'Fecha objetivo de una meta a largo plazo',
+  Agenda: 'Agenda', 'Plan your day and repeat your weekly routine': 'Organizá tu día y repetí tu rutina semanal', 'Add to agenda': 'Agregar a la agenda',
+  Event: 'Evento', Reminder: 'Recordatorio', 'Long-term goal': 'Meta a largo plazo', 'Choose a long-term goal': 'Elegí una meta a largo plazo',
+  'What should you remember?': '¿Qué necesitás recordar?', 'What are you doing?': '¿Qué vas a hacer?', Starts: 'Empieza', 'Ends (optional)': 'Termina (opcional)',
+  'Repeats weekly': 'Se repite semanalmente', 'One time': 'Una vez', 'Repeat on': 'Repetir los días', 'Active from': 'Activa desde', Date: 'Fecha', 'Notify me': 'Avisarme',
+  'Browser notifications are not supported here. The reminder will still appear in the agenda.': 'Este navegador no admite notificaciones. El recordatorio igual aparecerá en la agenda.',
+  'Notifications are blocked. The reminder will still appear in the agenda.': 'Las notificaciones están bloqueadas. El recordatorio igual aparecerá en la agenda.',
+  'Nothing planned for this day yet.': 'Todavía no hay nada programado para este día.', Weekly: 'Semanal', Notification: 'Notificación', 'Delete agenda item': 'Borrar elemento de la agenda', 'Scheduled reminder': 'Recordatorio programado',
+  'Add a mission for this day...': 'Agregar una misión para este día...',
+  'Repeats on the selected weekdays every week': 'Se repite cada semana en los días elegidos', 'Schedule for': 'Agenda de', planned: 'programados', 'Add an event or set up a weekly routine.': 'Agregá un evento o armá una rutina semanal.',
+  'No thoughts this day': 'No hay pensamientos para este día', 'No questions this day': 'No hay preguntas para este día',
+  'Delete this achievement post?': '¿Borrar esta publicación?', 'Delete post': 'Borrar publicación', 'Edit achievement': 'Editar logro',
+  'DAY': 'DÍA', 'No live data': 'Sin datos en vivo', 'Location': 'Ubicación', 'No category selected': 'Sin categoría',
+  'Delete mission?': '¿Borrar misión?', 'Delete question?': '¿Borrar pregunta?', 'Delete goal?': '¿Borrar meta?',
+  'What % of your day counts as a success?': '¿Qué porcentaje del día cuenta como éxito?', 'Add a mission for today...': 'Agregar misión para hoy...',
+  'Add a mission here or choose another category.': 'Agregá una misión acá o elegí otra categoría.', 'No missions this day': 'No hay misiones para este día',
+  'Save to achievements': 'Guardar en logros', 'Submit to Thoughts': 'Publicar en pensamientos', 'No thoughts yet': 'Todavía no hay pensamientos',
+  'No long-term goals yet': 'Todavía no hay metas a largo plazo', 'What do you want to achieve over time? Add your first goal.': '¿Qué querés lograr con el tiempo? Agregá tu primera meta.',
+  'Add a goal here or choose another category.': 'Agregá una meta acá o elegí otra categoría.', 'This long-term goal and all its milestones will be permanently removed.': 'Esta meta y todos sus hitos se eliminarán definitivamente.',
+  'Could not process this image.': 'No se pudo procesar esta imagen.', 'Could not load this image.': 'No se pudo cargar esta imagen.', 'Choose an image file.': 'Elegí un archivo de imagen.', 'The image must be smaller than 12 MB.': 'La imagen debe pesar menos de 12 MB.',
+  'Category': 'Categoría', 'Show all missions and goals': 'Mostrar todas las misiones y metas', 'Assign category': 'Asignar categoría', 'Create a category below the panel.': 'Creá una categoría debajo del panel.', 'Choose category color': 'Elegir color de categoría', 'Add category': 'Agregar categoría', 'Cancel category creation': 'Cancelar creación de categoría',
+  'Error': 'Error', 'Invalid login credentials': 'Correo o contraseña incorrectos', 'Email not confirmed': 'El correo todavía no está confirmado',
+  'There is no category yet': 'Todavía no hay categorías', 'Category:': 'Categoría:',
+  'Continue': 'Continuar', 'Open Questions': 'Preguntas abiertas', 'open — things to figure out': 'abiertas — cosas por resolver',
+  'Hide solved': 'Ocultar resueltas', 'Show solved': 'Mostrar resueltas', 'Add': 'Agregar', 'goals · Plan and track what you want to achieve': 'metas · Planificá y seguí lo que querés lograr',
+  'Add Goal': 'Agregar meta', 'Create Goal': 'Crear meta', 'Target': 'Objetivo', 'milestones': 'hitos', 'Edit goal': 'Editar meta', 'Delete goal': 'Borrar meta', 'Delete milestone': 'Borrar hito',
+  'Target:': 'Objetivo:', 'Importance': 'Importancia', '(custom)': '(personalizada)', 'Auto — even split': 'Automático — reparto parejo', 'Reset to auto': 'Volver a automático', 'Drag to set a custom weight. Others will auto-adjust to keep the total at 100%.': 'Arrastrá para asignar una importancia personalizada. Las demás se ajustarán para mantener el total en 100%.',
+  'Tip: 3-5 key missions make for a focused day.': 'Consejo: 3 a 5 misiones clave ayudan a enfocarte.', 'goal': 'meta', 'Success goal:': 'Meta de éxito:', '/ {threshold}% goal': '/ {threshold}% de la meta',
+  'Delete “{category}” and remove it from missions, goals, and achievements?': '¿Borrar “{category}” y quitarla de las misiones, metas y logros?',
+  'Could not read this photo.': 'No se pudo leer esta foto.', 'This file is not a supported image.': 'Este archivo de imagen no es compatible.', 'Could not prepare this photo.': 'No se pudo preparar esta foto.', 'Could not update that photo.': 'No se pudo actualizar esa foto.',
+  'Could not add that photo. Try another one.': 'No se pudo agregar esa foto. Probá con otra.',
+  'You did it, {name}!': '¡Lo lograste, {name}!', friend: 'amigo', 'Selected achievement': 'Logro seleccionado', 'Photo for': 'Foto de',
+  'New category name, maximum 20 characters': 'Nombre de categoría nuevo, máximo 20 caracteres',
+  'View achievements': 'Ver logros',
+  Clear: 'Despejado', Clouds: 'Nublado', Rain: 'Lluvia', Snow: 'Nieve', Drizzle: 'Llovizna', Thunderstorm: 'Tormenta', Mist: 'Neblina', Fog: 'Niebla', Haze: 'Bruma',
+  'DELETE': 'BORRAR', 'CANCEL': 'CANCELAR',
+  'Edit mission': 'Editar misión', 'Delete mission': 'Borrar misión', 'Edit question': 'Editar pregunta', 'Add milestone': 'Agregar hito',
+  'Partly Cloudy': 'Parcialmente nublado', Cloudy: 'Nublado', 'Light Rain': 'Lluvia ligera', Foggy: 'Con niebla',
+  'entry': 'entrada', 'day completed · Keep your daily consistency going': 'día completado · Mantené la constancia',
+  'goal · Plan and track what you want to achieve': 'meta · Planificá y seguí lo que querés lograr', 'milestone': 'hito',
+  'User already registered': 'Esta cuenta ya está registrada', 'Password should be at least 6 characters': 'La contraseña debe tener al menos 6 caracteres',
+  'Failed to fetch': 'No se pudo conectar. Revisá tu conexión e intentá de nuevo.',
+};
+
+export function translate(language: Language, text: string): string {
+  if (language === 'en') return text;
+  const missionCategory = text.match(/^No (.+) missions this day$/);
+  if (missionCategory) return `No hay misiones de ${missionCategory[1]} para este día`;
+  const goalCategory = text.match(/^No (.+) goals yet$/);
+  if (goalCategory) return `Todavía no hay metas de ${goalCategory[1]}`;
+  if (text.startsWith('Show ')) return `Mostrar ${text.slice(5)}`;
+  if (text.startsWith('Delete “') && text.endsWith('”')) return `Borrar “${text.slice(8, -1)}”`;
+  if (text.startsWith('Delete category ')) return `Borrar categoría ${text.slice(16)}`;
+  if (text.startsWith('Category: ')) return `Categoría: ${text.slice(10)}`;
+  return ES_MORE[text] ?? ES[text] ?? text;
+}

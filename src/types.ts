@@ -53,6 +53,22 @@ export interface LongTermGoal {
   category?: string;
 }
 
+export type AgendaItemKind = 'event' | 'reminder' | 'goal';
+
+export interface AgendaItem {
+  id: string;
+  title: string;
+  kind: AgendaItemKind;
+  date: string; // One-off date; retained for legacy weekly entries
+  startTime: string;
+  endTime?: string;
+  repeatsWeekly: boolean;
+  weekdays: number[]; // JavaScript weekday numbers: Sunday = 0
+  longTermGoalId?: string;
+  notify: boolean;
+  createdAt: number;
+}
+
 export interface StreakData {
   current: number;
   best: number;
@@ -63,6 +79,8 @@ export interface StreakData {
 export interface UserProfile {
   name: string;
   location: string;
+  photo?: string;
+  language?: 'en' | 'es';
 }
 
 export interface AppData {
@@ -71,6 +89,7 @@ export interface AppData {
   thoughts: Thought[];
   questions: Question[];
   longTerm: LongTermGoal[];
+  agendaItems: AgendaItem[];
   achievements: Achievement[];
   categories: string[];
   categoryColors: Record<string, string>;
@@ -91,6 +110,7 @@ export const emptyData: AppData = {
   thoughts: [],
   questions: [],
   longTerm: [],
+  agendaItems: [],
   achievements: [],
   categories: [],
   categoryColors: {},

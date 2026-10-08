@@ -8,7 +8,7 @@ import { relativeTime } from '@/utils/date';
 import { Question } from '@/types';
 
 export function QuestionsView() {
-  const { data, addQuestion, toggleQuestionStatus, editQuestion, deleteQuestion } = useApp();
+  const { data, addQuestion, toggleQuestionStatus, editQuestion, deleteQuestion, t, language } = useApp();
   const [newContent, setNewContent] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
@@ -45,8 +45,8 @@ export function QuestionsView() {
     <div className="mx-auto max-w-3xl">
       <div className="mb-5 flex items-end justify-between">
         <div>
-          <h1 className="font-display text-3xl uppercase leading-none text-ink">Questions</h1>
-          <p className="mt-1 font-mono text-xs text-ink/50">{openCount} open — things to figure out</p>
+          <h1 className="font-display text-3xl uppercase leading-none text-ink">{t('Questions')}</h1>
+          <p className="mt-1 font-mono text-xs text-ink/50">{openCount} {t('open — things to figure out')}</p>
         </div>
         <div className="flex h-10 w-10 animate-floatY items-center justify-center border-2 border-ink bg-gold shadow-panelSm">
           <HelpCircle size={20} strokeWidth={2.5} className="text-ink" />
@@ -56,12 +56,12 @@ export function QuestionsView() {
       {/* Counter banner */}
       {openCount > 0 && (
         <div className="mb-4 flex items-center justify-between border-2 border-ink bg-gold px-4 py-2.5 shadow-panelSm">
-          <span className="font-display text-sm uppercase">{openCount} Open Questions</span>
+          <span className="font-display text-sm uppercase">{openCount} {t('Open Questions')}</span>
           <button
             onClick={() => setShowSolved(!showSolved)}
             className="font-mono text-xs uppercase text-ink/60 underline hover:text-ink"
           >
-            {showSolved ? 'Hide solved' : 'Show solved'}
+            {t(showSolved ? 'Hide solved' : 'Show solved')}
           </button>
         </div>
       )}
@@ -70,7 +70,7 @@ export function QuestionsView() {
       <div className="checker-fill-bg mb-5 border-2 border-ink bg-gold/15 shadow-panelSm">
         <div className="flex items-center gap-2 border-b-2 border-gold/40 bg-gold/10 px-4 py-2">
           <Lightbulb size={14} strokeWidth={2.5} className="text-goldDark" />
-          <span className="font-mono text-[10px] uppercase tracking-widest text-ink/50">New Question</span>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-ink/50">{t('New Question')}</span>
         </div>
         <div className="flex gap-2 p-3">
           <input
@@ -78,7 +78,7 @@ export function QuestionsView() {
             value={newContent}
             onChange={e => setNewContent(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleAdd()}
-            placeholder="What do you need to figure out?"
+            placeholder={t('What do you need to figure out?')}
             className="flex-1 border-2 border-ink bg-cream px-4 py-2.5 font-body text-sm focus:border-gold focus:shadow-panelSm focus:outline-none"
           />
           <button
@@ -86,7 +86,7 @@ export function QuestionsView() {
             disabled={!newContent.trim()}
             className="btn-press flex items-center gap-1 border-2 border-ink bg-gold px-4 font-display text-xs uppercase tracking-wider text-ink disabled:opacity-40 hover:bg-goldDark"
           >
-            <Plus size={14} strokeWidth={3} /> Add
+            <Plus size={14} strokeWidth={3} /> {t('Add')}
           </button>
         </div>
       </div>
@@ -94,8 +94,8 @@ export function QuestionsView() {
       {/* List */}
       {visible.length === 0 ? (
         <EmptyState
-          title={openCount === 0 ? 'No open questions' : 'No questions to show'}
-          subtitle={openCount === 0 ? "Looks like you're clear for now." : 'Toggle solved to see history.'}
+          title={t(openCount === 0 ? 'No open questions' : 'No questions to show')}
+          subtitle={t(openCount === 0 ? "Looks like you're clear for now." : 'Toggle solved to see history.')}
           icon={<HelpCircle size={32} strokeWidth={1.5} />}
           color="bg-gold/10"
         />
@@ -139,9 +139,9 @@ export function QuestionsView() {
                 )}
                 <div className="mt-2 flex items-center gap-2">
                   <Tag color={q.status === 'open' ? 'bg-gold text-ink' : 'bg-leaf text-white'}>
-                    {q.status === 'open' ? 'OPEN' : 'SOLVED'}
+                    {t(q.status === 'open' ? 'OPEN' : 'SOLVED')}
                   </Tag>
-                  <span className="font-mono text-xs text-ink/40">{q.date} · {relativeTime(q.createdAt)}</span>
+                  <span className="font-mono text-xs text-ink/40">{q.date} · {relativeTime(q.createdAt, language)}</span>
                 </div>
               </div>
 
@@ -151,15 +151,15 @@ export function QuestionsView() {
                   <button
                     onClick={() => toggleQuestionStatus(q.id)}
                     className="border border-transparent p-1.5 hover:border-ink hover:bg-sky/20"
-                    title="Reopen"
+                    title={t('Reopen')}
                   >
                     <RotateCcw size={13} strokeWidth={2.5} className="text-ink/60" />
                   </button>
                 )}
-                <button onClick={() => startEdit(q)} className="border border-transparent p-1.5 hover:border-ink hover:bg-gold/20">
+                <button onClick={() => startEdit(q)} aria-label={t('Edit question')} className="border border-transparent p-1.5 hover:border-ink hover:bg-gold/20">
                   <Pencil size={13} strokeWidth={2.5} className="text-ink/60" />
                 </button>
-                <button onClick={() => setDeleteId(q.id)} className="border border-transparent p-1.5 hover:border-ink hover:bg-coral/20">
+                <button onClick={() => setDeleteId(q.id)} aria-label={t('Delete question')} className="border border-transparent p-1.5 hover:border-ink hover:bg-coral/20">
                   <Trash2 size={13} strokeWidth={2.5} className="text-ink/60" />
                 </button>
               </div>
@@ -170,8 +170,8 @@ export function QuestionsView() {
 
       <ConfirmDialog
         open={!!deleteId}
-        title="Delete question?"
-        message="This question will be permanently removed."
+        title={t('Delete question?')}
+        message={t('This question will be permanently removed.')}
         onConfirm={() => { if (deleteId) { deleteQuestion(deleteId); setDeleteId(null); } }}
         onCancel={() => setDeleteId(null)}
       />

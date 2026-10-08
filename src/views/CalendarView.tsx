@@ -4,6 +4,7 @@ import { useApp } from '@/context/AppContext';
 import { Panel, Tag } from '@/components/Panel';
 import { EmptyState } from '@/components/EmptyState';
 import { MissionList } from '@/components/MissionList';
+import { AgendaPlanner } from '@/components/AgendaPlanner';
 import {
   monthGrid, dateKey as toDateKey, monthLong, todayKey, parseKey, isToday,
   fullDateStr, weekdayShort,
@@ -11,7 +12,7 @@ import {
 import { WeatherInfo, getFallbackWeather } from '@/utils/weather';
 
 export function CalendarView() {
-  const { data } = useApp();
+  const { data, t, language } = useApp();
   const [calMonth, setCalMonth] = useState(() => {
     const d = new Date();
     return { year: d.getFullYear(), month: d.getMonth() };
@@ -20,6 +21,7 @@ export function CalendarView() {
 
   const grid = monthGrid(calMonth.year, calMonth.month);
   const completedSet = new Set(data.streak.completedDates);
+  const longTermTargetDates = new Set(data.longTerm.flatMap(goal => goal.targetDate ? [goal.targetDate] : []));
   const thoughtsForDay = data.thoughts.filter(t => t.date === selectedDate);
   const questionsForDay = data.questions.filter(q => q.date === selectedDate);
 
@@ -44,7 +46,7 @@ export function CalendarView() {
   };
 
   const selectedParsed = parseKey(selectedDate);
-  const monthName = monthLong(new Date(calMonth.year, calMonth.month, 1));
+  const monthName = monthLong(new Date(calMonth.year, calMonth.month, 1), language);
   const isFuture = selectedDate > todayKey();
 
   return (
@@ -53,8 +55,8 @@ export function CalendarView() {
         <div className="flex items-center gap-3">
           <div className="page-hero-icon"><CalendarDays size={22} strokeWidth={2.7} /></div>
           <div>
-            <h1 className="font-display text-3xl uppercase leading-none text-ink">Calendar</h1>
-            <p className="mt-1 font-mono text-xs text-ink/60">Browse dates and review your daily activity</p>
+            <h1 className="font-display text-3xl uppercase leading-none text-ink">{t('Calendar')}</h1>
+            <p className="mt-1 font-mono text-xs text-ink/60">{t('Browse dates and review your daily activity')}</p>
           </div>
         </div>
         {selectedDate !== todayKey() && (
@@ -62,7 +64,7 @@ export function CalendarView() {
             onClick={() => setSelectedDate(todayKey())}
             className="btn-press flex items-center gap-1 border-2 border-ink bg-coral px-3 py-2 font-display text-xs uppercase tracking-wider text-white hover:bg-coralDark"
           >
-            <ArrowLeft size={14} strokeWidth={3} /> Back to Today
+            <ArrowLeft size={14} strokeWidth={3} /> {t('Back to Today')}
           </button>
         )}
       </div>
@@ -80,7 +82,7 @@ export function CalendarView() {
         </div>
 
         <div className="mb-2 grid grid-cols-7 gap-1">
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+          {Array.from({ length: 7 }, (_, i) => weekdayShort(new Date(2024, 0, 7 + i), language)).map((d, i) => (
             <div key={i} className="py-1 text-center font-mono text-[10px] uppercase text-ink/40">{d}</div>
           ))}
         </div>
@@ -92,42 +94,59 @@ export function CalendarView() {
             const completed = completedSet.has(key);
             const today = isToday(key);
             const selected = key === selectedDate;
+            const hasLongTermTarget = longTermTargetDates.has(key);
+            const hasAgendaEntry = data.agendaItems.some(item => item.repeatsWeekly
+              ? item.weekdays.includes(d.getDay())
+              : item.date === key);
             return (
               <button
                 key={i}
                 onClick={() => setSelectedDate(key)}
-                className={`btn-press flex aspect-square items-center justify-center border-2 font-mono text-xs transition-all ${
+                title={hasLongTermTarget ? t('Long-term goal date') : undefined}
+                aria-label={`${d.getDate()}${hasLongTermTarget ? `, ${t('Long-term goal date')}` : ''}`}
+                className={`btn-press relative flex aspect-square items-center justify-center border-2 font-mono text-xs transition-all ${
                   selected
                     ? 'border-ink bg-ink font-bold text-cream'
                     : completed
                     ? 'border-ink bg-leaf text-white hover:bg-leafDark'
                     : today
                     ? 'border-coral bg-coral/10 font-bold text-coral hover:bg-coral/20'
+                    : hasLongTermTarget
+                    ? 'border-leaf bg-leaf/15 font-bold text-leafDark hover:bg-leaf/25'
                     : 'border-ink/20 bg-cream2 text-ink/60 hover:bg-mist/20'
                 }`}
               >
                 {d.getDate()}
+                {hasLongTermTarget && (
+                  <span
+                    aria-hidden="true"
+                    className={`absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full ${completed ? 'bg-white' : 'bg-leaf'}`}
+                  />
+                )}
+                {hasAgendaEntry && <span aria-hidden="true" className="absolute bottom-1 left-1 h-1.5 w-1.5 rounded-full bg-sky" />}
               </button>
             );
           })}
         </div>
       </Panel>
 
+      <AgendaPlanner selectedDate={selectedDate} />
+
       {/* Selected day detail */}
       <div key={selectedDate} className="animate-fadeIn">
         <div className="mb-4 flex items-center gap-2">
-          <Tag color="bg-ink text-cream">{weekdayShort(selectedParsed)}</Tag>
-          <h2 className="font-display text-xl uppercase">{fullDateStr(selectedParsed)}</h2>
+          <Tag color="bg-ink text-cream">{weekdayShort(selectedParsed, language)}</Tag>
+          <h2 className="font-display text-xl uppercase">{fullDateStr(selectedParsed, language)}</h2>
           {weather && (
             <span className="ml-auto font-mono text-xs text-ink/50">
-              {weather.temp}° · {weather.condition}
+              {weather.temp}° · {t(weather.condition)}
             </span>
           )}
         </div>
 
         {isFuture && (
           <div className="mb-4 border-2 border-gold bg-gold/20 p-3 text-sm text-ink/70">
-            This is a future date. You can plan ahead by adding missions below.
+            {t('This is a future date. You can plan ahead by adding missions below.')}
           </div>
         )}
 
@@ -135,19 +154,19 @@ export function CalendarView() {
         <Panel bg="bg-cream" className="mb-4 p-4">
           <div className="mb-3 flex items-center gap-2">
             <Sun size={16} strokeWidth={2.5} className="text-coral" />
-            <h3 className="font-display text-sm uppercase">Missions</h3>
+            <h3 className="font-display text-sm uppercase">{t('Missions')}</h3>
           </div>
-          <MissionList dateKey={selectedDate} readOnly={selectedDate !== todayKey()} />
+          <MissionList dateKey={selectedDate} readOnly={selectedDate !== todayKey()} allowAdd={isFuture} />
         </Panel>
 
         {/* Thoughts */}
         <Panel bg="bg-cream" className="mb-4 p-4">
           <div className="mb-3 flex items-center gap-2">
             <Brain size={16} strokeWidth={2.5} className="text-sky" />
-            <h3 className="font-display text-sm uppercase">Thoughts</h3>
+            <h3 className="font-display text-sm uppercase">{t('Thoughts')}</h3>
           </div>
           {thoughtsForDay.length === 0 ? (
-            <EmptyState title="No thoughts this day" subtitle="" icon={<Brain size={24} strokeWidth={1.5} />} />
+            <EmptyState title={t('No thoughts this day')} subtitle="" icon={<Brain size={24} strokeWidth={1.5} />} />
           ) : (
             <div className="space-y-2">
               {thoughtsForDay.map(t => (
@@ -163,16 +182,16 @@ export function CalendarView() {
         <Panel bg="bg-cream" className="p-4">
           <div className="mb-3 flex items-center gap-2">
             <HelpCircle size={16} strokeWidth={2.5} className="text-gold" />
-            <h3 className="font-display text-sm uppercase">Questions</h3>
+            <h3 className="font-display text-sm uppercase">{t('Questions')}</h3>
           </div>
           {questionsForDay.length === 0 ? (
-            <EmptyState title="No questions this day" subtitle="" icon={<HelpCircle size={24} strokeWidth={1.5} />} />
+            <EmptyState title={t('No questions this day')} subtitle="" icon={<HelpCircle size={24} strokeWidth={1.5} />} />
           ) : (
             <div className="space-y-2">
               {questionsForDay.map(q => (
                 <div key={q.id} className="flex items-start gap-2 border-2 border-ink/20 bg-cream2 p-3">
                   <Tag color={q.status === 'open' ? 'bg-gold text-ink' : 'bg-leaf text-white'}>
-                    {q.status === 'open' ? 'OPEN' : 'SOLVED'}
+                    {t(q.status === 'open' ? 'OPEN' : 'SOLVED')}
                   </Tag>
                   <span className={`text-sm ${q.status === 'solved' ? 'line-through text-ink/40' : ''}`}>{q.content}</span>
                 </div>

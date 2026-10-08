@@ -39,24 +39,30 @@ const WEEKDAYS_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', '
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-export function weekdayShort(d: Date): string {
+export function weekdayShort(d: Date, language: 'en' | 'es' = 'en'): string {
+  if (language === 'es') return new Intl.DateTimeFormat('es-AR', { weekday: 'short' }).format(d).replace('.', '').toUpperCase();
   return WEEKDAYS[d.getDay()];
 }
-export function weekdayLong(d: Date): string {
+export function weekdayLong(d: Date, language: 'en' | 'es' = 'en'): string {
+  if (language === 'es') return new Intl.DateTimeFormat('es-AR', { weekday: 'long' }).format(d);
   return WEEKDAYS_LONG[d.getDay()];
 }
-export function monthShort(d: Date): string {
+export function monthShort(d: Date, language: 'en' | 'es' = 'en'): string {
+  if (language === 'es') return new Intl.DateTimeFormat('es-AR', { month: 'short' }).format(d).replace('.', '').toUpperCase();
   return MONTHS[d.getMonth()];
 }
-export function monthLong(d: Date): string {
+export function monthLong(d: Date, language: 'en' | 'es' = 'en'): string {
+  if (language === 'es') return new Intl.DateTimeFormat('es-AR', { month: 'long' }).format(d);
   return MONTHS_LONG[d.getMonth()];
 }
 
-export function fullDateStr(d: Date): string {
+export function fullDateStr(d: Date, language: 'en' | 'es' = 'en'): string {
+  if (language === 'es') return new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(d);
   return `${weekdayLong(d)}, ${monthLong(d)} ${d.getDate()}, ${d.getFullYear()}`;
 }
 
-export function timeStr(d: Date): string {
+export function timeStr(d: Date, language: 'en' | 'es' = 'en'): string {
+  if (language === 'es') return new Intl.DateTimeFormat('es-AR', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(d);
   let h = d.getHours();
   const m = String(d.getMinutes()).padStart(2, '0');
   const ampm = h >= 12 ? 'PM' : 'AM';
@@ -78,16 +84,16 @@ export function greetingEs(d: Date): string {
   return 'Buenas noches';
 }
 
-export function relativeTime(ts: number): string {
+export function relativeTime(ts: number, language: 'en' | 'es' = 'en'): string {
   const diff = Date.now() - ts;
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return language === 'es' ? 'hace un momento' : 'just now';
+  if (mins < 60) return language === 'es' ? `hace ${mins} min` : `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
+  if (hrs < 24) return language === 'es' ? `hace ${hrs} h` : `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
-  if (days < 7) return `${days}d ago`;
-  return dateKey(new Date(ts));
+  if (days < 7) return language === 'es' ? `hace ${days} d` : `${days}d ago`;
+  return language === 'es' ? new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short' }).format(new Date(ts)) : dateKey(new Date(ts));
 }
 
 export function monthGrid(year: number, month: number): (Date | null)[][] {

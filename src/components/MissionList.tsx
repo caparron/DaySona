@@ -36,13 +36,14 @@ function compressAchievementPhoto(file: File): Promise<string> {
 interface MissionListProps {
   dateKey: string;
   readOnly?: boolean;
+  allowAdd?: boolean;
 }
 
-export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
+export function MissionList({ dateKey, readOnly = false, allowAdd = false }: MissionListProps) {
   const {
     data, addMission, setMissionCategory, addCategory, deleteCategory, toggleMission, editMission, deleteMission, addAchievement, addThought,
     setMissionImportance, setSuccessThreshold,
-    firstCompletionToday, clearFirstCompletion,
+    firstCompletionToday, clearFirstCompletion, t,
   } = useApp();
 
   const [newTitle, setNewTitle] = useState('');
@@ -71,6 +72,7 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
   const completed = missions.filter(m => m.done).length;
   const total = missions.length;
   const isToday = dateKey === todayKey();
+  const canAdd = !readOnly || allowAdd;
 
   const dayProgress = getDayProgress(dateMissions, allMissions);
   const threshold = data.successThreshold;
@@ -91,7 +93,7 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
 
   const handleAdd = () => {
     if (!newTitle.trim()) return;
-    addMission(newTitle, dateKey, !readOnly ? newMissionCategory : undefined);
+    addMission(newTitle, dateKey, canAdd ? newMissionCategory : undefined);
     setNewTitle('');
   };
 
@@ -207,28 +209,28 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
         <div className="flex items-baseline gap-2">
           <span className="font-display text-3xl">{completed}</span>
           <span className="font-display text-xl text-ink/40">/ {total}</span>
-          <span className="ml-1 font-mono text-xs uppercase text-ink/50">completed</span>
+          <span className="ml-1 font-mono text-xs uppercase text-ink/50">{t('completed')}</span>
         </div>
         <div className="flex items-center gap-2">
           <span className={`font-display text-lg ${isSuccessful ? 'text-leaf' : 'text-ink/50'}`}>
             {dayProgress}%
           </span>
           <span className={`font-mono text-[10px] uppercase ${isSuccessful ? 'text-leaf' : 'text-ink/40'}`}>
-            / {threshold}% goal
+            {t('/ {threshold}% goal').replace('{threshold}', String(threshold))}
           </span>
         </div>
       </div>
 
       {/* Weighted progress bar with threshold marker */}
       <div className="relative mb-2">
-        <ProgressBar value={dayProgress} max={100} color={isSuccessful ? 'bg-leaf' : 'bg-coral'} />
+        <ProgressBar value={dayProgress} max={100} color={isSuccessful ? 'bg-leaf' : 'bg-coral'} className="jrpg-energy-meter" />
         {/* Threshold marker */}
         <div
           className="absolute top-[-3px] bottom-[-3px] w-1 bg-ink"
           style={{ left: `${threshold}%` }}
         >
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[8px] uppercase text-ink/60">
-            goal
+            {t('goal')}
           </div>
         </div>
       </div>
@@ -241,7 +243,7 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
             className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-ink/50 hover:text-ink"
           >
             <Target size={11} strokeWidth={2.5} />
-            Success goal: {threshold}%
+            {t('Success goal:')} {threshold}%
             <span className="text-ink/30">{showThreshold ? '▲' : '▼'}</span>
           </button>
           {showThreshold && (
@@ -256,7 +258,7 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
               />
               <div className="flex justify-between font-mono text-[9px] text-ink/40">
                 <span>0%</span>
-                <span>What % of your day counts as a success?</span>
+                <span>{t('What % of your day counts as a success?')}</span>
                 <span>100%</span>
               </div>
             </div>
@@ -265,7 +267,7 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
       )}
 
       {/* Add mission */}
-      {!readOnly && (
+      {canAdd && (
         <div className="mb-4 flex gap-2">
           <input
             ref={inputRef}
@@ -273,14 +275,14 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
             value={newTitle}
             onChange={e => setNewTitle(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleAdd()}
-            placeholder="Add a mission for today..."
+            placeholder={t(isToday ? 'Add a mission for today...' : 'Add a mission for this day...')}
             className="flex-1 border-2 border-ink bg-cream2 px-4 py-2.5 font-body text-sm transition-all focus:border-coral focus:shadow-panelSm focus:outline-none"
           />
           <button
             onClick={handleAdd}
             className="btn-press flex items-center gap-1 border-2 border-ink bg-coral px-4 font-display text-xs uppercase tracking-wider text-white hover:bg-coralDark"
           >
-            <Plus size={14} strokeWidth={3} /> Add
+            <Plus size={14} strokeWidth={3} /> {t('Add')}
           </button>
           <CategoryAssigner categories={data.categories} categoryColors={data.categoryColors} category={newMissionCategory} onChange={setNewMissionCategory} />
         </div>
@@ -289,8 +291,8 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
       {/* Mission list */}
       {missions.length === 0 ? (
         <EmptyState
-          title={selectedCategory && !readOnly ? `No ${selectedCategory} missions this day` : isToday ? 'What do you want to accomplish today?' : 'No missions this day'}
-          subtitle={selectedCategory && !readOnly ? 'Add a mission here or choose another category.' : isToday ? 'Add your first goal and start your day.' : 'This day was quiet.'}
+          title={t(selectedCategory && !readOnly ? `No ${selectedCategory} missions this day` : isToday ? 'What do you want to accomplish today?' : 'No missions this day')}
+          subtitle={t(selectedCategory && !readOnly ? 'Add a mission here or choose another category.' : isToday ? 'Add your first goal and start your day.' : 'This day was quiet.')}
           icon={<Plus size={32} strokeWidth={2} />}
         />
       ) : (
@@ -302,7 +304,7 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
             return (
               <div
                 key={m.id}
-                className={`mission-row group border-2 border-ink p-3 transition-all duration-200 animate-slideInLeft ${
+                className={`mission-row jrpg-mission-row group border-2 border-ink p-3 transition-all duration-200 animate-slideInLeft ${
                   m.done ? 'bg-leaf/15' : 'bg-cream'
                 }`}
                 style={{
@@ -353,7 +355,7 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
                         ? 'border-coral bg-coral/10 text-coralDark'
                         : 'border-ink/20 bg-cream2 text-ink/40'
                     } ${readOnly ? 'cursor-default' : 'hover:shadow-panelSm'}`}
-                    title={isCustom ? 'Custom importance' : 'Auto (even split)'}
+                    title={t(isCustom ? 'Custom importance' : 'Auto (even split)')}
                   >
                     {Math.round(weight)}%
                   </button>
@@ -362,13 +364,13 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
                   {!readOnly && editingId !== m.id && (
                     <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                       <button
-                        onClick={() => startEdit(m)}
+                        onClick={() => startEdit(m)} aria-label={t('Edit mission')}
                         className="border border-transparent p-1.5 hover:border-ink hover:bg-gold/20"
                       >
                         <Pencil size={14} strokeWidth={2.5} className="text-ink/60" />
                       </button>
                       <button
-                        onClick={() => setDeleteId(m.id)}
+                        onClick={() => setDeleteId(m.id)} aria-label={t('Delete mission')}
                         className="border border-transparent p-1.5 hover:border-ink hover:bg-coral/20"
                       >
                         <Trash2 size={14} strokeWidth={2.5} className="text-ink/60" />
@@ -381,8 +383,8 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
                   <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-ink/10 pt-2">
                     <CategoryAssigner categories={data.categories} categoryColors={data.categoryColors} category={editCategory} onChange={setEditCategory} />
                     <div className="flex gap-1">
-                      <button type="button" onClick={() => { setEditingId(null); setEditValue(''); setEditCategory(undefined); }} className="border border-ink/20 p-1.5 hover:bg-cream2" aria-label="Cancel mission edit"><X size={14} /></button>
-                      <button type="button" onClick={commitEdit} disabled={!editValue.trim()} className="border border-ink/20 p-1.5 text-leafDark hover:bg-leaf/10 disabled:opacity-40" aria-label="Save mission edit"><Check size={14} strokeWidth={3} /></button>
+                      <button type="button" onClick={() => { setEditingId(null); setEditValue(''); setEditCategory(undefined); }} className="border border-ink/20 p-1.5 hover:bg-cream2" aria-label={t('Cancel mission edit')}><X size={14} /></button>
+                      <button type="button" onClick={commitEdit} disabled={!editValue.trim()} className="border border-ink/20 p-1.5 text-leafDark hover:bg-leaf/10 disabled:opacity-40" aria-label={t('Save mission edit')}><Check size={14} strokeWidth={3} /></button>
                     </div>
                   </div>
                 )}
@@ -393,10 +395,10 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
                     <div className="mb-1 flex items-center justify-between">
                       <span className="flex items-center gap-1 font-mono text-[10px] uppercase text-ink/50">
                         <GripVertical size={11} strokeWidth={2.5} />
-                        Importance
+                        {t('Importance')}
                       </span>
                       <span className="font-mono text-[10px] text-ink/40">
-                        {isCustom ? `${m.importance}% (custom)` : 'Auto — even split'}
+                        {isCustom ? `${m.importance}% ${t('(custom)')}` : t('Auto — even split')}
                       </span>
                     </div>
                     <input
@@ -414,14 +416,14 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
                           onClick={() => setMissionImportance(m.id, -1)}
                           className="font-mono text-[9px] uppercase text-coral hover:underline"
                         >
-                          Reset to auto
+                          {t('Reset to auto')}
                         </button>
                       )}
                       <span className="font-mono text-[9px] text-ink/30">100%</span>
                     </div>
                     {!isCustom && (
                       <p className="mt-1 font-mono text-[9px] text-ink/30">
-                        Drag to set a custom weight. Others will auto-adjust to keep the total at 100%.
+                        {t('Drag to set a custom weight. Others will auto-adjust to keep the total at 100%.')}
                       </p>
                     )}
                   </div>
@@ -435,7 +437,7 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
       {/* Suggestion */}
       {!readOnly && missions.length > 0 && missions.length < 5 && (
         <p className="mt-3 font-mono text-xs italic text-ink/40">
-          Tip: 3-5 key missions make for a focused day.
+          {t('Tip: 3-5 key missions make for a focused day.')}
         </p>
       )}
 
@@ -445,8 +447,8 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
 
       <ConfirmDialog
         open={!!deleteId}
-        title="Delete mission?"
-        message="This mission will be permanently removed."
+        title={t('Delete mission?')}
+        message={t('This mission will be permanently removed.')}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteId(null)}
       />
@@ -458,22 +460,22 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
               <div className="flex h-12 w-12 shrink-0 items-center justify-center border-2 border-ink bg-leaf text-white shadow-panelSm">
                 <Trophy size={25} strokeWidth={2.5} />
               </div>
-              <button type="button" onClick={closeAchievementPopup} aria-label="Close congratulations" className="border-2 border-ink bg-white p-2 hover:bg-cream2">
+              <button type="button" onClick={closeAchievementPopup} aria-label={t('Close congratulations')} className="border-2 border-ink bg-white p-2 hover:bg-cream2">
                 <X size={18} strokeWidth={2.5} />
               </button>
             </div>
-            <p className="font-mono text-[10px] uppercase tracking-[.2em] text-leafDark">Mission complete!</p>
-            <h2 id="achievement-title" className="mt-2 font-display text-2xl leading-tight md:text-3xl">You did it, {data.profile?.name || 'friend'}!</h2>
+            <p className="font-mono text-[10px] uppercase tracking-[.2em] text-leafDark">{t('Mission complete!')}</p>
+            <h2 id="achievement-title" className="mt-2 font-display text-2xl leading-tight md:text-3xl">{t('You did it, {name}!').replace('{name}', data.profile?.name || t('friend'))}</h2>
             <p className="mt-2 border-l-4 border-leaf pl-3 font-body text-sm text-ink/75">{pendingAchievement.title}</p>
 
-            {achievementPhoto && <img src={achievementPhoto} alt="Selected achievement" className="mt-4 max-h-48 w-full border-2 border-ink object-cover" />}
-            {photoError && <p role="alert" className="mt-2 font-mono text-xs text-coralDark">{photoError}</p>}
+            {achievementPhoto && <img src={achievementPhoto} alt={t('Selected achievement')} className="mt-4 max-h-48 w-full border-2 border-ink object-cover" />}
+            {photoError && <p role="alert" className="mt-2 font-mono text-xs text-coralDark">{t(photoError)}</p>}
             <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={event => { void handleAchievementPhoto(event.target.files?.[0]); event.target.value = ''; }} />
 
             <div className="mt-6 grid gap-2 sm:grid-cols-3">
-              <button type="button" onClick={saveAchievement} className="btn-press border-2 border-ink bg-leaf px-3 py-3 font-display text-[10px] uppercase text-white hover:bg-leafDark">Save to achievements</button>
-              <button type="button" disabled={uploadingPhoto} onClick={() => photoInputRef.current?.click()} className="btn-press flex items-center justify-center gap-1 border-2 border-ink bg-white px-3 py-3 font-display text-[10px] uppercase hover:bg-cream2 disabled:opacity-60"><ImagePlus size={15} /> {uploadingPhoto ? 'Adding photo…' : 'Upload photo & post'}</button>
-              <button type="button" onClick={closeAchievementPopup} className="btn-press border-2 border-ink bg-cream2 px-3 py-3 font-display text-[10px] uppercase hover:bg-white">Close</button>
+              <button type="button" onClick={saveAchievement} className="btn-press border-2 border-ink bg-leaf px-3 py-3 font-display text-[10px] uppercase text-white hover:bg-leafDark">{t('Save to achievements')}</button>
+              <button type="button" disabled={uploadingPhoto} onClick={() => photoInputRef.current?.click()} className="btn-press flex items-center justify-center gap-1 border-2 border-ink bg-white px-3 py-3 font-display text-[10px] uppercase hover:bg-cream2 disabled:opacity-60"><ImagePlus size={15} /> {t(uploadingPhoto ? 'Adding photo…' : 'Upload photo & post')}</button>
+              <button type="button" onClick={closeAchievementPopup} className="btn-press border-2 border-ink bg-cream2 px-3 py-3 font-display text-[10px] uppercase hover:bg-white">{t('Close')}</button>
             </div>
           </section>
         </div>
@@ -486,32 +488,32 @@ export function MissionList({ dateKey, readOnly = false }: MissionListProps) {
               <div className="h-3 w-3 rounded-full border border-ink/30 bg-coral/40" />
               <div className="h-3 w-3 rounded-full border border-ink/30 bg-gold/50" />
               <div className="h-3 w-3 rounded-full border border-ink/30 bg-leaf/40" />
-              <span className="ml-2 flex-1 font-mono text-[10px] uppercase tracking-widest text-ink/50">Day complete</span>
-              <button type="button" onClick={() => { setShowDayReflection(false); setDayReflectionContent(''); }} aria-label="Close day reflection" className="border-2 border-ink bg-white p-1.5 hover:bg-cream2"><X size={16} /></button>
+              <span className="ml-2 flex-1 font-mono text-[10px] uppercase tracking-widest text-ink/50">{t('Day complete')}</span>
+              <button type="button" onClick={() => { setShowDayReflection(false); setDayReflectionContent(''); }} aria-label={t('Close day reflection')} className="border-2 border-ink bg-white p-1.5 hover:bg-cream2"><X size={16} /></button>
             </div>
             <div className="p-5 md:p-7">
-              <div className="mb-3 flex items-center gap-2 text-leafDark"><Brain size={20} /><span className="font-mono text-[10px] uppercase tracking-[.18em]">Every mission complete</span></div>
-              <h2 id="day-complete-title" className="font-display text-2xl uppercase md:text-3xl">You finished your day!</h2>
-              <p className="mt-2 font-body text-sm text-ink/70">Want to reflect on your day or write down what you’ll do next?</p>
+              <div className="mb-3 flex items-center gap-2 text-leafDark"><Brain size={20} /><span className="font-mono text-[10px] uppercase tracking-[.18em]">{t('Every mission complete')}</span></div>
+              <h2 id="day-complete-title" className="font-display text-2xl uppercase md:text-3xl">{t('You finished your day!')}</h2>
+              <p className="mt-2 font-body text-sm text-ink/70">{t('Want to reflect on your day or write down what you’ll do next?')}</p>
               <textarea
                 autoFocus
                 value={dayReflectionContent}
                 onChange={event => setDayReflectionContent(event.target.value)}
                 onKeyDown={event => { if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) { if (dayReflectionContent.trim()) { addThought(dayReflectionContent); setDayReflectionContent(''); setShowDayReflection(false); } } }}
-                placeholder="Today I felt… / Next, I want to…"
+                placeholder={t('Today I felt… / Next, I want to…')}
                 rows={4}
                 className="mt-4 w-full resize-none border-0 bg-transparent px-1 py-2 font-body text-base leading-7 text-ink/90 placeholder:text-ink/35 focus:outline-none"
                 style={{ lineHeight: '28px' }}
               />
               <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t-2 border-sky/30 pt-3">
-                <button type="button" onClick={() => { setShowDayReflection(false); setDayReflectionContent(''); }} className="font-mono text-[10px] uppercase tracking-wider text-ink/55 underline hover:text-ink">Not now</button>
+                <button type="button" onClick={() => { setShowDayReflection(false); setDayReflectionContent(''); }} className="font-mono text-[10px] uppercase tracking-wider text-ink/55 underline hover:text-ink">{t('Not now')}</button>
                 <button
                   type="button"
                   disabled={!dayReflectionContent.trim()}
                   onClick={() => { addThought(dayReflectionContent); setDayReflectionContent(''); setShowDayReflection(false); }}
                   className="btn-press flex items-center gap-1.5 border-2 border-ink bg-sky px-4 py-2 font-display text-xs uppercase tracking-wider text-white disabled:opacity-40 hover:bg-skyDark"
                 >
-                  <Plus size={14} strokeWidth={3} /> Submit to Thoughts
+                  <Plus size={14} strokeWidth={3} /> {t('Submit to Thoughts')}
                 </button>
               </div>
             </div>

@@ -12,6 +12,7 @@ export function LongTermView() {
   const {
     data, addLongTerm, updateLongTerm, deleteLongTerm,
     addMilestone, toggleMilestone, deleteMilestone, addCategory, deleteCategory,
+    t,
   } = useApp();
 
   const [showForm, setShowForm] = useState(false);
@@ -71,15 +72,15 @@ export function LongTermView() {
         <div className="flex items-center gap-3">
           <div className="page-hero-icon"><Target size={22} strokeWidth={2.7} /></div>
           <div>
-            <h1 className="font-display text-3xl uppercase leading-none text-ink">Long Term</h1>
-            <p className="mt-1 font-mono text-xs text-ink/60">{data.longTerm.length} goals · Plan and track what you want to achieve</p>
+            <h1 className="font-display text-3xl uppercase leading-none text-ink">{t('Long Term')}</h1>
+            <p className="mt-1 font-mono text-xs text-ink/60">{data.longTerm.length} {t(data.longTerm.length === 1 ? 'goal · Plan and track what you want to achieve' : 'goals · Plan and track what you want to achieve')}</p>
           </div>
         </div>
         <button
           onClick={() => { const next = !showForm; setShowForm(next); if (next) setFormCategory(selectedCategory || undefined); }}
           className="btn-press flex items-center gap-1 border-2 border-ink bg-leaf px-3 py-2 font-display text-xs uppercase tracking-wider text-white hover:bg-leafDark"
         >
-          <Plus size={14} strokeWidth={3} /> Add Goal
+          <Plus size={14} strokeWidth={3} /> {t('Add Goal')}
         </button>
       </div>
 
@@ -90,14 +91,14 @@ export function LongTermView() {
             type="text"
             value={formTitle}
             onChange={e => setFormTitle(e.target.value)}
-            placeholder="Goal title (e.g. Learn Italian)"
+            placeholder={t('Goal title (e.g. Learn Italian)')}
             className="mb-2 w-full border-2 border-ink bg-cream2 px-3 py-2.5 font-body text-sm focus:border-leaf focus:shadow-panelSm focus:outline-none"
             autoFocus
           />
           <textarea
             value={formDesc}
             onChange={e => setFormDesc(e.target.value)}
-            placeholder="Description (optional)"
+            placeholder={t('Description (optional)')}
             rows={2}
             className="mb-2 w-full resize-none border-2 border-ink bg-cream2 px-3 py-2.5 font-body text-sm focus:border-leaf focus:shadow-panelSm focus:outline-none"
           />
@@ -109,20 +110,20 @@ export function LongTermView() {
               onChange={e => setFormDate(e.target.value)}
               className="border-2 border-ink bg-cream2 px-3 py-1.5 font-mono text-xs focus:border-leaf focus:outline-none"
             />
-            <span className="font-mono text-xs text-ink/40">Target date (optional)</span>
+            <span className="font-mono text-xs text-ink/40">{t('Target date (optional)')}</span>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CategoryAssigner categories={data.categories} categoryColors={data.categoryColors} category={formCategory} onChange={setFormCategory} />
             <div className="flex gap-2">
               <button onClick={() => setShowForm(false)} className="btn-press border-2 border-ink bg-cream2 px-3 py-2 font-display text-xs uppercase">
-                Cancel
+                {t('Cancel')}
               </button>
               <button
                 onClick={handleAdd}
                 disabled={!formTitle.trim()}
                 className="btn-press border-2 border-ink bg-leaf px-4 py-2 font-display text-xs uppercase text-white disabled:opacity-40 hover:bg-leafDark"
               >
-                Create Goal
+                {t('Create Goal')}
               </button>
             </div>
           </div>
@@ -132,8 +133,8 @@ export function LongTermView() {
       {/* Goals */}
       {goals.length === 0 && !showForm ? (
         <EmptyState
-          title={selectedCategory ? `No ${selectedCategory} goals yet` : 'No long-term goals yet'}
-          subtitle={selectedCategory ? 'Add a goal here or choose another category.' : 'What do you want to achieve over time? Add your first goal.'}
+          title={t(selectedCategory ? `No ${selectedCategory} goals yet` : 'No long-term goals yet')}
+          subtitle={t(selectedCategory ? 'Add a goal here or choose another category.' : 'What do you want to achieve over time? Add your first goal.')}
           icon={<Target size={32} strokeWidth={1.5} />}
           color="bg-leaf/10"
         />
@@ -175,10 +176,10 @@ export function LongTermView() {
                         <CategoryAssigner categories={data.categories} categoryColors={data.categoryColors} category={editCategory} onChange={setEditCategory} />
                         <div className="flex gap-2">
                           <button onClick={() => { setEditingId(null); setEditCategory(undefined); }} className="btn-press border-2 border-ink bg-cream2 px-3 py-1.5 font-display text-xs uppercase">
-                            <X size={12} strokeWidth={3} className="mr-1 inline" />Cancel
+                            <X size={12} strokeWidth={3} className="mr-1 inline" />{t('Cancel')}
                           </button>
                           <button onClick={commitEdit} className="btn-press border-2 border-ink bg-leaf px-3 py-1.5 font-display text-xs uppercase text-white">
-                            <Check size={12} strokeWidth={3} className="mr-1 inline" />Save
+                            <Check size={12} strokeWidth={3} className="mr-1 inline" />{t('Save')}
                           </button>
                         </div>
                       </div>
@@ -191,10 +192,10 @@ export function LongTermView() {
                           {g.description && <p className="mt-1 text-sm text-ink/60">{g.description}</p>}
                         </div>
                         <div className="flex shrink-0 items-center gap-1">
-                          <button onClick={() => startEdit(g)} className="border border-transparent p-1.5 hover:border-ink hover:bg-gold/20">
+                          <button onClick={() => startEdit(g)} aria-label={t('Edit goal')} className="border border-transparent p-1.5 hover:border-ink hover:bg-gold/20">
                             <Pencil size={13} strokeWidth={2.5} className="text-ink/60" />
                           </button>
-                          <button onClick={() => setDeleteId(g.id)} className="border border-transparent p-1.5 hover:border-ink hover:bg-coral/20">
+                          <button onClick={() => setDeleteId(g.id)} aria-label={t('Delete goal')} className="border border-transparent p-1.5 hover:border-ink hover:bg-coral/20">
                             <Trash2 size={13} strokeWidth={2.5} className="text-ink/60" />
                           </button>
                         </div>
@@ -203,7 +204,7 @@ export function LongTermView() {
                       {/* Progress bar */}
                       <div className="mt-3">
                         <div className="mb-1 flex items-center justify-between">
-                          <span className="font-mono text-xs uppercase text-ink/50">Progress</span>
+                          <span className="font-mono text-xs uppercase text-ink/50">{t('Progress')}</span>
                           <span className="font-display text-sm">{g.progress}%</span>
                         </div>
                         <ProgressBar value={g.progress} max={100} color="bg-leaf" />
@@ -213,7 +214,7 @@ export function LongTermView() {
                       {g.targetDate && (
                         <div className="mt-2 flex items-center gap-1.5">
                           <Calendar size={12} strokeWidth={2.5} className="text-ink/40" />
-                          <span className="font-mono text-xs text-ink/50">Target: {g.targetDate}</span>
+                          <span className="font-mono text-xs text-ink/50">{t('Target')}: {g.targetDate}</span>
                         </div>
                       )}
 
@@ -223,7 +224,7 @@ export function LongTermView() {
                         className="mt-2 flex items-center gap-1 font-mono text-xs uppercase text-ink/50 hover:text-ink"
                       >
                         {expanded ? <ChevronUp size={12} strokeWidth={3} /> : <ChevronDown size={12} strokeWidth={3} />}
-                        {g.milestones.length} milestones
+                        {g.milestones.length} {t(g.milestones.length === 1 ? 'milestone' : 'milestones')}
                       </button>
                     </>
                   )}
@@ -247,6 +248,7 @@ export function LongTermView() {
                             <span className={`flex-1 text-sm ${ms.done ? 'text-ink/40 line-through' : 'text-ink'}`}>{ms.title}</span>
                             <button
                               onClick={() => deleteMilestone(g.id, ms.id)}
+                              aria-label={t('Delete milestone')}
                               className="p-1 opacity-0 hover:bg-coral/20 group-hover:opacity-100"
                             >
                               <Trash2 size={11} strokeWidth={2.5} className="text-ink/50" />
@@ -266,7 +268,7 @@ export function LongTermView() {
                             setMilestoneGoalId(null);
                           }
                         }}
-                        placeholder="Add milestone..."
+                        placeholder={t('Add milestone...')}
                         className="flex-1 border-2 border-ink bg-cream px-2.5 py-1.5 font-body text-xs focus:border-leaf focus:outline-none"
                       />
                       <button
@@ -280,7 +282,7 @@ export function LongTermView() {
                         }}
                         className="btn-press border-2 border-ink bg-leaf px-2.5 py-1.5 font-display text-xs uppercase text-white hover:bg-leafDark"
                       >
-                        <Plus size={12} strokeWidth={3} />
+                        <Plus size={12} strokeWidth={3} /> <span className="sr-only">{t('Add milestone')}</span>
                       </button>
                     </div>
                   </div>
@@ -295,8 +297,8 @@ export function LongTermView() {
 
       <ConfirmDialog
         open={!!deleteId}
-        title="Delete goal?"
-        message="This long-term goal and all its milestones will be permanently removed."
+        title={t('Delete goal?')}
+        message={t('This long-term goal and all its milestones will be permanently removed.')}
         onConfirm={() => { if (deleteId) { deleteLongTerm(deleteId); setDeleteId(null); } }}
         onCancel={() => setDeleteId(null)}
       />

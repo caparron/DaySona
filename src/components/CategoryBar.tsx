@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
 
 interface CategoryBarProps {
   categories: string[];
@@ -17,6 +18,7 @@ function readableText(color: string): string {
 }
 
 export function CategoryBar({ categories, categoryColors, selectedCategory, onSelect, onAdd, onDelete }: CategoryBarProps) {
+  const { t } = useApp();
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState('');
   const [color, setColor] = useState('#ffd23f');
@@ -24,9 +26,9 @@ export function CategoryBar({ categories, categoryColors, selectedCategory, onSe
 
   const save = () => {
     const value = name.trim();
-    if (!value) return setError('Enter a category name.');
+    if (!value) return setError(t('Enter a category name.'));
     if (categories.some(category => category.toLocaleLowerCase() === value.toLocaleLowerCase())) {
-      return setError('That category already exists.');
+      return setError(t('That category already exists.'));
     }
     onAdd(value, color);
     setName('');
@@ -46,16 +48,16 @@ export function CategoryBar({ categories, categoryColors, selectedCategory, onSe
                 aria-pressed={selectedCategory === category}
                 onClick={() => onSelect(selectedCategory === category ? null : category)}
                 className={`min-w-20 px-3 text-left font-display text-[10px] uppercase transition-[filter,box-shadow] ${selectedCategory === category ? 'brightness-90 ring-2 ring-inset ring-ink' : 'hover:brightness-95'}`}
-                title={selectedCategory === category ? 'Show all missions and goals' : `Show ${category}`}
+                title={selectedCategory === category ? t('Show all missions and goals') : `${t('Show')} ${category}`}
               >
                 <span className="block max-w-40 truncate">{category}</span>
               </button>
               <button
                 type="button"
-                aria-label={`Delete category ${category}`}
-                title={`Delete ${category}`}
+                aria-label={`${t('Delete category')} ${category}`}
+                title={`${t('Delete')} ${category}`}
                 onClick={() => {
-                  if (window.confirm(`Delete “${category}” and remove it from missions, goals, and achievements?`)) {
+                  if (window.confirm(t('Delete “{category}” and remove it from missions, goals, and achievements?').replace('{category}', category))) {
                     if (selectedCategory === category) onSelect(null);
                     onDelete(category);
                   }
@@ -69,10 +71,10 @@ export function CategoryBar({ categories, categoryColors, selectedCategory, onSe
         })}
         {Array.from({ length: Math.max(0, 4 - categories.length) }, (_, index) => (
           <div key={`placeholder-${index}`} aria-hidden="true" className="flex h-9 min-w-20 items-center border-2 border-dashed border-ink/25 px-3 font-mono text-[9px] uppercase tracking-wider text-ink/25">
-            Category
+            {t('Category')}
           </div>
         ))}
-        <button type="button" aria-label="Add category" onClick={() => { setAdding(true); setError(''); }} className="flex h-9 w-10 items-center justify-center border-2 border-ink bg-gold shadow-panelSm transition-transform hover:-translate-y-0.5">
+        <button type="button" aria-label={t('Add category')} onClick={() => { setAdding(true); setError(''); }} className="flex h-9 w-10 items-center justify-center border-2 border-ink bg-gold shadow-panelSm transition-transform hover:-translate-y-0.5">
           <Plus size={17} strokeWidth={3} />
         </button>
       </div>
@@ -86,21 +88,21 @@ export function CategoryBar({ categories, categoryColors, selectedCategory, onSe
               value={name}
               onChange={event => { setName(event.target.value); setError(''); }}
               onKeyDown={event => { if (event.key === 'Enter') save(); if (event.key === 'Escape') setAdding(false); }}
-              placeholder="e.g. Gym, Study, Social"
-              aria-label="New category name, maximum 20 characters"
+              placeholder={t('e.g. Gym, Study, Social')}
+              aria-label={t('New category name, maximum 20 characters')}
               className="w-full border-2 border-ink bg-white px-3 py-2 font-body text-sm focus:outline-none"
             />
             <div className="mt-1 flex justify-between font-mono text-[9px] text-ink/45">
-              {error ? <span role="alert" className="text-coralDark">{error}</span> : <span>Max 20 characters</span>}
+              {error ? <span role="alert" className="text-coralDark">{error}</span> : <span>{t('Max 20 characters')}</span>}
               <span>{name.length}/20</span>
             </div>
           </div>
           <label className="flex h-10 items-center gap-2 border-2 border-ink bg-white px-2 font-mono text-[9px] uppercase text-ink/60">
-            Color
-            <input type="color" aria-label="Choose category color" value={color} onChange={event => setColor(event.target.value)} className="h-7 w-8 cursor-pointer border-0 bg-transparent p-0" />
+            {t('Color')}
+            <input type="color" aria-label={t('Choose category color')} value={color} onChange={event => setColor(event.target.value)} className="h-7 w-8 cursor-pointer border-0 bg-transparent p-0" />
           </label>
-          <button type="button" onClick={save} className="border-2 border-ink bg-leaf px-3 py-2 font-display text-[10px] uppercase text-white hover:bg-leafDark">Save</button>
-          <button type="button" aria-label="Cancel category creation" onClick={() => { setAdding(false); setError(''); }} className="border-2 border-ink bg-white p-2 hover:bg-cream2"><X size={16} /></button>
+          <button type="button" onClick={save} className="border-2 border-ink bg-leaf px-3 py-2 font-display text-[10px] uppercase text-white hover:bg-leafDark">{t('Save')}</button>
+          <button type="button" aria-label={t('Cancel category creation')} onClick={() => { setAdding(false); setError(''); }} className="border-2 border-ink bg-white p-2 hover:bg-cream2"><X size={16} /></button>
         </div>
       )}
     </div>

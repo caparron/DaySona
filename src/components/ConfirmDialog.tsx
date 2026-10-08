@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -12,6 +13,7 @@ interface ConfirmDialogProps {
 }
 
 export function ConfirmDialog({ open, title, message, confirmLabel = 'DELETE', cancelLabel = 'CANCEL', onConfirm, onCancel }: ConfirmDialogProps) {
+  const { t } = useApp();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -42,13 +44,13 @@ export function ConfirmDialog({ open, title, message, confirmLabel = 'DELETE', c
             onClick={onCancel}
             className="btn-press border-2 border-ink bg-cream2 px-4 py-2 font-display text-xs uppercase tracking-wider hover:bg-mist/30"
           >
-            {cancelLabel}
+            {t(cancelLabel === 'CANCEL' ? 'Cancel' : cancelLabel)}
           </button>
           <button
             onClick={onConfirm}
             className="btn-press border-2 border-ink bg-coral text-white px-4 py-2 font-display text-xs uppercase tracking-wider hover:bg-coralDark"
           >
-            {confirmLabel}
+            {t(confirmLabel === 'DELETE' ? 'Delete' : confirmLabel)}
           </button>
         </div>
       </div>

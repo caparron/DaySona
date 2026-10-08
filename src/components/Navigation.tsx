@@ -1,6 +1,7 @@
-import { CalendarDays, Sun, Brain, HelpCircle, Target, Flame, LogOut, Trophy } from 'lucide-react';
+import { CalendarDays, Sun, Brain, HelpCircle, Target, Flame, LogOut, Trophy, Settings } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
 
-export type View = 'today' | 'thoughts' | 'questions' | 'longterm' | 'streak' | 'calendar' | 'achievements';
+export type View = 'today' | 'thoughts' | 'questions' | 'longterm' | 'streak' | 'calendar' | 'achievements' | 'settings';
 
 interface NavItem {
   id: View;
@@ -24,18 +25,20 @@ interface TopNavigationProps {
   current: View;
   onNavigate: (view: View) => void;
   streakCount: number;
+  profilePhoto?: string;
   onSignOut?: () => void;
 }
 
-export function TopNavigation({ current, onNavigate, streakCount, onSignOut }: TopNavigationProps) {
+export function TopNavigation({ current, onNavigate, streakCount, profilePhoto, onSignOut }: TopNavigationProps) {
+  const { t } = useApp();
   return (
-    <header className="sticky top-0 z-40 border-b-3 border-ink bg-yellow-300/95 backdrop-blur-sm">
+    <header className="jrpg-header sticky top-0 z-40 border-b-3 border-ink bg-yellow-300/95 backdrop-blur-sm">
       <div className="mx-auto flex max-w-[1440px] items-center gap-4 px-4 py-3 md:px-7">
         <div className="hidden shrink-0 items-center gap-2 sm:flex">
-          <img src="/daysona-logo.png" alt="DaySona" className="h-10 w-10 border-2 border-ink object-cover shadow-panelSm" />
+          <img src="/daysona-logo.png" alt="DaySona" className="jrpg-brand-mark h-10 w-10 border-2 border-ink object-cover shadow-panelSm" />
           <div className="hidden lg:block">
-            <h1 className="font-display text-lg leading-none">DAYSONA</h1>
-            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-ink/50">New round / new day</p>
+            <h1 className="jrpg-wordmark font-display text-lg leading-none">DAYSONA</h1>
+            <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-ink/50">{t('New round / new day')}</p>
           </div>
         </div>
 
@@ -47,12 +50,13 @@ export function TopNavigation({ current, onNavigate, streakCount, onSignOut }: T
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
-                className={`group relative flex shrink-0 items-center gap-2 border-2 border-ink px-3 py-2 transition-all duration-200 btn-press md:px-4 ${
+                aria-current={selected ? 'page' : undefined}
+                className={`jrpg-nav-tab group relative flex shrink-0 items-center gap-2 border-2 border-ink px-3 py-2 transition-all duration-200 btn-press md:px-4 ${
                   selected ? `${item.active} shadow-panelSm -translate-y-0.5` : 'bg-cream2 text-ink/65 hover:-translate-y-1 hover:bg-cream'
                 }`}
               >
                 <Icon size={16} strokeWidth={2.7} className="transition-transform duration-200 group-hover:rotate-[-8deg] group-hover:scale-110" />
-                <span className="font-display text-[11px] uppercase tracking-wide md:text-xs">{item.label}</span>
+                <span className="font-display text-[11px] uppercase tracking-wide md:text-xs">{t(item.label)}</span>
                 {item.id === 'streak' && streakCount > 0 && (
                   <span className="font-mono text-[10px] font-bold">{streakCount}</span>
                 )}
@@ -61,16 +65,26 @@ export function TopNavigation({ current, onNavigate, streakCount, onSignOut }: T
             );
           })}
         </nav>
+        <button
+          type="button"
+          onClick={() => onNavigate('settings')}
+          aria-label={t('Settings')}
+          title={t('Settings')}
+          className={`btn-press relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden border-2 border-ink shadow-panelSm transition hover:-translate-y-0.5 ${current === 'settings' ? 'bg-gold' : 'bg-white hover:bg-cream2'}`}
+        >
+          {profilePhoto ? <img src={profilePhoto} alt="" className="h-full w-full object-cover" /> : <Settings size={18} strokeWidth={2.5} />}
+          {profilePhoto && <span className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center border-l border-t border-ink bg-gold"><Settings size={10} strokeWidth={3} /></span>}
+        </button>
         {onSignOut && (
           <button
             type="button"
             onClick={onSignOut}
-            aria-label="Sign out"
-            title="Sign out"
-            className="btn-press flex shrink-0 items-center justify-center gap-2 border-2 border-ink bg-white px-2.5 py-2 font-display text-[10px] uppercase hover:bg-cream2 sm:px-3"
+            aria-label={t('Sign out')}
+            title={t('Sign out')}
+            className="jrpg-signout btn-press flex shrink-0 items-center justify-center gap-2 border-2 border-ink bg-white px-2.5 py-2 font-display text-[10px] uppercase hover:bg-cream2 sm:px-3"
           >
             <LogOut size={16} strokeWidth={2.5} />
-            <span className="hidden xl:inline">Sign out</span>
+            <span className="hidden xl:inline">{t('Sign out')}</span>
           </button>
         )}
       </div>
@@ -94,6 +108,7 @@ interface BottomNavProps {
 }
 
 export function BottomNav({ current, onNavigate }: BottomNavProps) {
+  const { t } = useApp();
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t-2 border-ink bg-ink md:hidden">
       {NAV_ITEMS.map(item => {
@@ -102,7 +117,7 @@ export function BottomNav({ current, onNavigate }: BottomNavProps) {
         return (
           <button key={item.id} onClick={() => onNavigate(item.id)} className={`flex min-w-0 flex-1 flex-col items-center gap-1 py-2 ${selected ? item.color : 'text-mist'}`}>
             <Icon size={16} strokeWidth={2.7} />
-            <span className="font-display text-[8px] uppercase">{item.label.split(' ')[0]}</span>
+            <span className="font-display text-[8px] uppercase">{t(item.label).split(' ')[0]}</span>
           </button>
         );
       })}
