@@ -1,22 +1,13 @@
 import { useRef, useState } from 'react';
 import { ImagePlus, Trash2, UserRound } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { compressImage } from '@/utils/images';
 
 async function prepareImage(file: File): Promise<string> {
   if (!file.type.startsWith('image/')) throw new Error('Choose an image file.');
   if (file.size > 12 * 1024 * 1024) throw new Error('The image must be smaller than 12 MB.');
 
-  const source = await createImageBitmap(file);
-  const maxSide = 480;
-  const scale = Math.min(1, maxSide / Math.max(source.width, source.height));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(source.width * scale));
-  canvas.height = Math.max(1, Math.round(source.height * scale));
-  const context = canvas.getContext('2d');
-  if (!context) throw new Error('Could not process this image.');
-  context.drawImage(source, 0, 0, canvas.width, canvas.height);
-  source.close();
-  return canvas.toDataURL('image/jpeg', 0.78);
+  return compressImage(file, 480);
 }
 
 export function ProfilePhotoPicker({ value, onChange }: { value?: string; onChange: (photo?: string) => void }) {

@@ -9,29 +9,7 @@ import { CategoryBar } from '@/components/CategoryBar';
 import { CategoryAssigner } from '@/components/CategoryAssigner';
 import { todayKey } from '@/utils/date';
 import { getMissionWeight, getDayProgress } from '@/utils/weights';
-
-function compressAchievementPhoto(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Could not read this photo.'));
-    reader.onload = () => {
-      const image = new Image();
-      image.onerror = () => reject(new Error('This file is not a supported image.'));
-      image.onload = () => {
-        const scale = Math.min(1, 1200 / Math.max(image.width, image.height));
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.max(1, Math.round(image.width * scale));
-        canvas.height = Math.max(1, Math.round(image.height * scale));
-        const context = canvas.getContext('2d');
-        if (!context) return reject(new Error('Could not prepare this photo.'));
-        context.drawImage(image, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', 0.78));
-      };
-      image.src = String(reader.result);
-    };
-    reader.readAsDataURL(file);
-  });
-}
+import { compressImage } from '@/utils/images';
 
 interface MissionListProps {
   dateKey: string;
@@ -149,7 +127,7 @@ export function MissionList({ dateKey, readOnly = false, allowAdd = false }: Mis
     try {
       setPhotoError('');
       setUploadingPhoto(true);
-      const photo = await compressAchievementPhoto(file);
+      const photo = await compressImage(file, 1200);
       setAchievementPhoto(photo);
       if (pendingAchievement) {
         addAchievement({

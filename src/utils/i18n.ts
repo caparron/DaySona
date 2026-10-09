@@ -1,6 +1,17 @@
 export type Language = 'en' | 'es';
 
 const ES: Record<string, string> = {
+  'SOCIAL LINKS': 'SOCIAL LINKS', 'Your friends, building their SONAs too.': 'Tus amigos también están construyendo sus SONAs.',
+  'Find friends by account name': 'Buscá amigos por nombre de cuenta', 'Search account names…': 'Buscar nombres de cuenta…',
+  'Type at least 2 characters.': 'Escribí al menos 2 caracteres.', 'No accounts found.': 'No encontramos cuentas.',
+  Friends: 'Amigos', 'Request received': 'Solicitud recibida', 'Request declined': 'Solicitud rechazada', Pending: 'Pendiente', Add: 'Agregar', day: 'día', days: 'días',
+  'Friend requests': 'Solicitudes de amistad', Accept: 'Aceptar', 'Accept request': 'Aceptar solicitud', 'Decline request': 'Rechazar solicitud',
+  'Sent requests': 'Solicitudes enviadas', 'Your friends': 'Tus amigos', 'Loading…': 'Cargando…',
+  'No friends yet.': 'Todavía no tenés amigos.', 'Search for your friends above to connect.': 'Buscá a tus amigos arriba para conectar.',
+  'Could not load Social Links. Apply the latest Supabase schema and try again.': 'No se pudo cargar Social Links. Aplicá el esquema actualizado de Supabase e intentá de nuevo.',
+  'DaySona player': 'Usuario de DaySona',
+  'Could not search accounts. Apply the latest Supabase schema and try again.': 'No se pudieron buscar cuentas. Aplicá el esquema actualizado de Supabase e intentá de nuevo.',
+  'That action could not be completed. Please try again.': 'No se pudo completar esa acción. Intentá de nuevo.',
   'Every day is a new round': 'Cada día es una nueva partida',
   'New round / new day': 'Nueva partida / nuevo día',
   'Small steps. Bigger days.': 'Pequeños pasos. Grandes días.',
@@ -72,6 +83,7 @@ const ES_MORE: Record<string, string> = {
   'Tip: 3-5 key missions make for a focused day.': 'Consejo: 3 a 5 misiones clave ayudan a enfocarte.', 'goal': 'meta', 'Success goal:': 'Meta de éxito:', '/ {threshold}% goal': '/ {threshold}% de la meta',
   'Delete “{category}” and remove it from missions, goals, and achievements?': '¿Borrar “{category}” y quitarla de las misiones, metas y logros?',
   'Could not read this photo.': 'No se pudo leer esta foto.', 'This file is not a supported image.': 'Este archivo de imagen no es compatible.', 'Could not prepare this photo.': 'No se pudo preparar esta foto.', 'Could not update that photo.': 'No se pudo actualizar esa foto.',
+  'This image could not be decoded. Try a JPG, PNG, or WebP image.': 'No se pudo decodificar esta imagen. Probá con una imagen JPG, PNG o WebP.',
   'Could not add that photo. Try another one.': 'No se pudo agregar esa foto. Probá con otra.',
   'You did it, {name}!': '¡Lo lograste, {name}!', friend: 'amigo', 'Selected achievement': 'Logro seleccionado', 'Photo for': 'Foto de',
   'New category name, maximum 20 characters': 'Nombre de categoría nuevo, máximo 20 caracteres',

@@ -11,6 +11,7 @@ import { StreakView } from '@/views/StreakView';
 import { CalendarView } from '@/views/CalendarView';
 import { AchievementsView } from '@/views/AchievementsView';
 import { SettingsView } from '@/views/SettingsView';
+import { SocialLinksView } from '@/views/SocialLinksView';
 import { DayHud } from '@/components/DayHud';
 import { dateKey } from '@/utils/date';
 
@@ -22,6 +23,7 @@ const VIEW_COMPONENTS: Record<View, () => JSX.Element> = {
   streak: StreakView,
   calendar: CalendarView,
   achievements: AchievementsView,
+  social: SocialLinksView,
   settings: SettingsView,
 };
 

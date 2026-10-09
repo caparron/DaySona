@@ -4,29 +4,7 @@ import { useApp } from '@/context/AppContext';
 import { EmptyState } from '@/components/EmptyState';
 import { Tag } from '@/components/Panel';
 import type { Achievement } from '@/types';
-
-function compressAchievementPhoto(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Could not read this photo.'));
-    reader.onload = () => {
-      const image = new Image();
-      image.onerror = () => reject(new Error('This file is not a supported image.'));
-      image.onload = () => {
-        const scale = Math.min(1, 1200 / Math.max(image.width, image.height));
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.max(1, Math.round(image.width * scale));
-        canvas.height = Math.max(1, Math.round(image.height * scale));
-        const context = canvas.getContext('2d');
-        if (!context) return reject(new Error('Could not prepare this photo.'));
-        context.drawImage(image, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', 0.78));
-      };
-      image.src = String(reader.result);
-    };
-    reader.readAsDataURL(file);
-  });
-}
+import { compressImage } from '@/utils/images';
 
 export function AchievementsView() {
   const { data, updateAchievementPhoto, deleteAchievement, t, language } = useApp();
@@ -42,7 +20,7 @@ export function AchievementsView() {
       return;
     }
     try {
-      updateAchievementPhoto(achievement.id, await compressAchievementPhoto(file));
+      updateAchievementPhoto(achievement.id, await compressImage(file, 1200));
       setEditingId(null);
       setPhotoError('');
     } catch (error) {

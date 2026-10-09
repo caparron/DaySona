@@ -253,6 +253,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timeout);
   }, [data, dataReady, dataUserId, session?.user.id]);
 
+  useEffect(() => {
+    const userId = session?.user.id;
+    if (!userId || !dataReady || dataUserId !== userId || !data.profile) return;
+    void supabase.from('social_profiles').upsert({
+      user_id: userId,
+      display_name: data.profile.name,
+      photo_url: data.profile.photo ?? null,
+      city: data.profile.location,
+      streak_count: data.streak.current,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' });
+  }, [data.profile?.name, data.profile?.photo, data.profile?.location, data.streak.current, dataReady, dataUserId, session?.user.id]);
+
   const retryCloudSync = useCallback(() => setSyncRetry(value => value + 1), []);
 
   const signOut = useCallback(async () => {

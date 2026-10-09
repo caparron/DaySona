@@ -1,7 +1,7 @@
-import { CalendarDays, Sun, Brain, HelpCircle, Target, Flame, LogOut, Trophy, Settings } from 'lucide-react';
+import { CalendarDays, Sun, Brain, HelpCircle, Target, Flame, LogOut, Trophy, Settings, Users } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 
-export type View = 'today' | 'thoughts' | 'questions' | 'longterm' | 'streak' | 'calendar' | 'achievements' | 'settings';
+export type View = 'today' | 'thoughts' | 'questions' | 'longterm' | 'streak' | 'calendar' | 'achievements' | 'social' | 'settings';
 
 interface NavItem {
   id: View;
@@ -19,6 +19,7 @@ export const NAV_ITEMS: NavItem[] = [
   { id: 'longterm', label: 'LONG TERM', icon: Target, color: 'bg-leaf', active: 'bg-leaf text-white' },
   { id: 'streak', label: 'STREAK', icon: Flame, color: 'bg-ember', active: 'bg-ember text-white' },
   { id: 'achievements', label: 'ACHIEVEMENTS', icon: Trophy, color: 'bg-leaf', active: 'bg-leaf text-white' },
+  { id: 'social', label: 'SOCIAL LINKS', icon: Users, color: 'bg-sky', active: 'bg-sky text-white' },
 ];
 
 interface TopNavigationProps {
